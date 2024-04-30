@@ -6,8 +6,8 @@
 <template>
     <Head title="Dashboard"/>
     <PanelLayout title="Dashboard">
-        <div class="grid grid-cols-3 gap-5 h-40">
-            <div class="bg-blue-400 p-4 flex justify-center items-center">
+        <div class="grid gap-5 h-40" :class="$page.props.user.roles.includes('collaborator') || $page.props.user.roles.includes('collaborator') ? 'grid-cols-2' : 'grid-cols-3'">
+            <div v-if="$page.props.user.roles.includes('admin')" class="bg-blue-400 p-4 flex justify-center items-center">
                 <svg class="mr-5" xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                 <ul>
                     <li class="uppercase text-white text-2xl font-bold">
@@ -37,13 +37,13 @@
                 <div class="font-bold mb-3">LAST USERS</div>
                 <Table :Items="$page.props.lastUsers" :Categorie="'lastUsers'" />
             </div> 
-            <div :class="$page.props.user.roles.includes('editor') ? 'col-span-3' : 'col-span-2'" class="bg-slate-50 p-4 flex items-center flex-col col-span-2">
+            <div :class="$page.props.user.roles.includes('editor') || $page.props.user.roles.includes('collaborator') ? 'col-span-3' : 'col-span-2'" class="bg-slate-50 p-4 flex items-center flex-col col-span-2">
                 <div class="font-bold mb-3">LAST REQUESTS</div>
                 <Table :Items="$page.props.lastRequests" :Categorie="'lastRequests'" />
             </div>
         </div>
         <div class="grid grid-cols-3 gap-5 mt-10">
-            <div  :class="$page.props.user.roles.includes('editor') ? 'col-span-3' : 'col-span-2'" class="bg-slate-50 p-4 flex items-center flex-col col-span-2">
+            <div  :class="$page.props.user.roles.includes('editor') || $page.props.user.roles.includes('collaborator') ? 'col-span-3' : 'col-span-2'" class="bg-slate-50 p-4 flex items-center flex-col col-span-2">
                 <div class="font-bold mb-3">LAST PENDING COURSES</div>
                 <Table :Items="$page.props.lastPending" :Categorie="'lastPending'" />
             </div> 

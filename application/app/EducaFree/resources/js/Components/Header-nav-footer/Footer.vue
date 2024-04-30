@@ -12,9 +12,9 @@
           </div>
           <div class="grid grid-cols-3 gap-8 sm:gap-6 sm:grid-cols3 ">
             <div>
-                <h2 class="mb-6 text-sm font-semibold text-gray-900 dark:text-white uppercase">Upload</h2>
+                <h2  v-if="$page.props.auth.user && $page.props.auth.user.email_verified_at != null" class="mb-6 text-sm font-semibold text-gray-900 dark:text-white uppercase">Upload</h2>
                   <ul class="text-gray-500 dark:text-gray-300 font-medium">
-                      <li class="mb-4">
+                      <li class="mb-4" v-if="$page.props.auth.user && $page.props.auth.user.email_verified_at != null">
                         <Link :href="route('upload')" class="hover:underline ">Upload a course</Link>
                       </li> 
                   </ul>

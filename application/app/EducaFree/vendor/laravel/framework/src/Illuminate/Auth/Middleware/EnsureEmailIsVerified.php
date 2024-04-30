@@ -33,9 +33,15 @@ class EnsureEmailIsVerified
         if (! $request->user() ||
             ($request->user() instanceof MustVerifyEmail &&
             ! $request->user()->hasVerifiedEmail())) {
-            return $request->expectsJson()
-                    ? abort(403, 'Your email address is not verified.')
-                    : Redirect::guest(URL::route($redirectToRoute ?: 'verification.notice'));
+                if ($request->expectsJson()) {
+                    return response()->json(['message' => 'Please verify your email before proceeding!']);
+                } else {
+                    // Otherwise, set a flash message for the glowing effect
+                    session()->flash('glowing', true);
+                    
+                    // Redirect back to the previous page
+                    return redirect()->back();
+                }
         }
 
         return $next($request);

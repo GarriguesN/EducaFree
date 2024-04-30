@@ -18,14 +18,19 @@ class EmailVerificationNotificationController extends Controller
      */
     public function store(Request $request)
     {
-        if ($request->user()->hasVerifiedEmail()) {
-            return $request->wantsJson()
-                        ? new JsonResponse('', 204)
-                        : redirect()->intended(Fortify::redirects('email-verification'));
+        try {
+            if ($request->user()->hasVerifiedEmail()) {
+
+                return $request->wantsJson()
+                            ? new JsonResponse('', 204)
+                            : redirect()->intended(Fortify::redirects('email-verification'));
+            }
+
+            $request->user()->sendEmailVerificationNotification();
+
+            return app(EmailVerificationNotificationSentResponse::class);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('message', 'An error occurred while sending the email. Please try again later.');
         }
-
-        $request->user()->sendEmailVerificationNotification();
-
-        return app(EmailVerificationNotificationSentResponse::class);
     }
 }

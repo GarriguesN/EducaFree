@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Jetstream\Http\Controllers\Inertia\UserProfileController;
-
+use App\Http\Middleware\EnsureEmailIsVerified;
 /*
 |--------------------------------------------------------------------------
 | Web Routes

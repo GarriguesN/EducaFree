@@ -31,7 +31,7 @@
             <textarea id="comment" name="comment" v-model="form.comment" autocomplete="comment" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-[80%] dark:bg-zinc-600 dark:border-gray-600" rows="1"></textarea>
             <InputError :message="$page.props.errors.comment" class="m-2"/>
 
-            <PrimaryButton class="m-5" type="submit">
+            <PrimaryButton class="m-5" :type="'button'" @click.prevent="$emit('submit')">
                 {{!edit ? 'comment' : 'edit'}}
             </PrimaryButton>
         </div>    

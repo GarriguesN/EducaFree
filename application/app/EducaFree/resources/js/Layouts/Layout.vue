@@ -24,12 +24,16 @@ export default  {
 
 <template>
 <main>
+
     <header>
         <Navbar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" />
     </header>
 
+    
     <article class="dark:bg-zinc-700 dark:text-white">
+        
         <slot />
+        
     </article>
 
     <footer v-if="cmid == null">

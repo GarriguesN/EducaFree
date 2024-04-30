@@ -53,12 +53,19 @@ const formEditReply = useForm({
 
 // Función para agregar un comentario a un curso
 const addComment = () => {
-    form.post(route('course.comment', form.id))
+    form.post(route('course.comment', form.id),{
+        preserveScroll: true,
+        preserveState: true
+    })
+    
 }
 
 //Funcion para contestar el comentario (commentId)
 const replyComment = (commentId) => {
-    formReply.post(route('course.replyComment', commentId))
+    formReply.post(route('course.replyComment', commentId),{
+        preserveScroll: true,
+        preserveState: true
+    })
 }
 
 // Función asíncrona para obtener los comentarios del curso
@@ -94,13 +101,19 @@ const openEditReply = (id, comment) => {
 
 // Funcion para enviar el comentario editado
 const editComment = (commentId) => {
-    formEditComment.put(route('course.editComment', commentId))
+    formEditComment.put(route('course.editComment', commentId),{
+        preserveScroll: true,
+        preserveState: true
+    })
 }
 
 // Funcion para eliminar el comentario
 const deleteComment = () => {
     let idComment = id.value
-    router.delete(route('course.deleteComment', { id: idComment, idCourse: idCourse.value }))
+    router.delete(route('course.deleteComment', { id: idComment, idCourse: idCourse.value }),{
+        preserveScroll: true,
+        preserveState: true
+    })
     showModalDelete.value  = false
     id.value = null;
 }
@@ -108,14 +121,20 @@ const deleteComment = () => {
 // Funcion para eliminar la respuesta
 const deleteReply = () => {
     let idReply = id.value
-    router.delete(route('course.deleteReply', { id: idReply, idCourse: idCourse.value }))
+    router.delete(route('course.deleteReply', { id: idReply, idCourse: idCourse.value }),{
+        preserveScroll: true,
+        preserveState: true
+    })
     showModalDelete.value  = false
     id.value = null;
 }
 
 // Funcion para enviar la respuesta editada
 const editReply = (replyId) => {
-    formEditReply.put(route('course.editReply', replyId))
+    formEditReply.put(route('course.editReply', replyId),{
+        preserveScroll: true,
+        preserveState: true
+    })
 }
 
 // Funcion para saber si es una respuesta
@@ -236,7 +255,7 @@ if(usePage().props.lessons.length == 1){
                             {{ new Date(comment.created_at).toDateString() }}
                         </p>
                     </div>
-                        <div v-if="($page.props.auth.user.roles && $page.props.auth.user.roles[0]?.name || 'none') === 'admin' || $page.props.auth.user.id == comment.user_id" class="flex items-center text-sm text-gray-300">
+                        <div v-if="($page.props.auth.user.roles && $page.props.auth.user.roles[0]?.name || 'none') === 'admin' || $page.props.auth.user.id == comment.user_id" class="flex items-center text-sm text-gray-400 dark:text-gray-300">
                                     <p @click="openEditComment(comment.id, comment.comment)" class="m-1 hover:text-blue-700 cursor-pointer">Edit</p>
                                     <p>/</p>
                                     <p @click="openDelete(comment.id, 'comment')" class="m-1 hover:text-red-700 cursor-pointer">Delete</p>
@@ -335,7 +354,7 @@ if(usePage().props.lessons.length == 1){
                 <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                <h3 class="mb-5 text-lg font-normal text-gray-500">Are you sure you want to delete it?</h3>
+                <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-200">Are you sure you want to delete it?</h3>
                     <button v-if="type == 'comment'" @click="deleteComment(id.value)" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Yes, delete</button>
                     <button v-if="type == 'reply'" @click="deleteReply(id.value)" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Yes, delete</button>
                 <button @click="showModalDelete=false" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100">No, cancel</button>
@@ -347,7 +366,7 @@ if(usePage().props.lessons.length == 1){
                 <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
-                <h3 class="mb-5 text-lg font-normal text-gray-500">Report Reason</h3>
+                <h3 class="mb-5 text-lg font-normal text-gray-500  dark:text-gray-200">Report Reason</h3>
                 <div class="m-auto flex justify-center justify-around">
                     <button @click="postReport(id, type, 'Troll')" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300  font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Troll</button>
                     <button @click="postReport(id, type, 'Bad Words')" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Bad Words</button>

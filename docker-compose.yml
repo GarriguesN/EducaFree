@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  db:
+    container_name: db
+    image: 'mysql:8.2.0'
+    volumes:
+      - './application/db_data:/var/lib/mysql'
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=app
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=admin
+    ports:
+      - '3306:3306'
+
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: pma
+    links:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      restart: always
+    ports:
+      - 8081:80
+
+
+  php-fpm:
+    container_name: php-fpm
+    build:
+      context: .
+      dockerfile: ./php-fpm/Dockerfile
+    volumes:
+      - ./application/moodle:/var/www/html
+    #  - ./phpdocker/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/overrides.ini
+
+  apache-httpd:
+    container_name: apache
+    build:
+      context: .
+      dockerfile: ./apache/Dockerfile
+    volumes:
+      - ./application/moodle:/var/www/html
+    ports:
+      - "8080:80"
+    depends_on:
+      - php-fpm
+
+  app:
+    container_name: app
+    build:
+      context: .
+      dockerfile: ./dockerfile
+    volumes:
+      - ./application/app:/var/www/html
+      - ./application/config:/etc/apache2/sites-available
+    ports:
+      - "80:80"

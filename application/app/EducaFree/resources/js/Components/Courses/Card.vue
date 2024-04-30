@@ -1,0 +1,126 @@
+<script setup>
+import { Link } from '@inertiajs/vue3';
+import { router } from '@inertiajs/vue3'
+
+//Definición de los props
+const props = defineProps({
+    course: {
+        type: Object
+    },
+    cmid: {
+        type: Number,
+        default: null
+    },
+    where: {
+        type: String
+    }
+})
+
+const urlBase = 'http://192.168.1.128/storage/ImagesCourses/';
+
+//Funcion para guardar el ultimo curso visitado
+function saveLastVisitedCourse(courseId, courseName) {
+    const lastVisitedCourse = { id: courseId, name: courseName };
+    localStorage.setItem('last_visited_course', JSON.stringify(lastVisitedCourse));
+}
+
+//Funcion para calcular el tiempo estimado de un curso
+const estimatedTime = (lessonsCount) => {
+    const totalTime = lessonsCount * 15;
+    const hours = Math.floor(totalTime / 60);
+    const minutes = totalTime % 60;
+    return `${hours} hr ${minutes} min`;
+}
+
+//Funcion para añadir a favoritos el curso
+const favorite = (id) => {
+    return router.post(route('courses.addFavorites', [id]));
+}
+
+</script>
+
+<template>
+    <div class="relative w-full  min-[770px]:w-80 lg:w-96 dark:bg-zinc-700 dark:text-white">
+        <Link @click="saveLastVisitedCourse(course.id, course.name)"
+            :href="cmid ? '/course/' + course.id + '/' + cmid : '/course/' + course.id"
+            class="border w-full  min-[770px]:w-80 lg:w-96 h-[30rem] flex flex-col justify-between hover:shadow-lg dark:border-gray-600">
+        <div>
+            <div class="h-56 border-b dark:border-gray-600 overflow-hidden">
+                <img class="h-auto max-w-full min-[770px]:h-full" :src="urlBase+course.img">
+            </div>
+            <div class="m-2 p-2 text-base font-bold line-clamp-1 text-center text-lg">
+                {{ course.name }}
+            </div>
+            <div class="m-2 p-2 text-lg font-normal line-clamp-3 text-justify">
+                {{ course.description }}
+            </div>
+        </div>
+
+        <div v-if="where !== 'home'">
+            <p v-if="course.progress && course.progress < 100">
+            <div class="w-full bg-gray-200 m-auto">
+                <div class="bg-blue-700 text-xs font-medium text-white text-center p-0.5 leading-none"
+                    :style="{ width: `${course.progress}%` }"> {{ course.progress }}%</div>
+            </div>
+            </p>
+            <p v-else-if="course.progress == 100">
+            <div class="w-full bg-gray-200 m-auto">
+                <div class="bg-blue-700 text-xs font-medium text-white text-center p-0.5 leading-none"
+                    :style="{ width: `${course.progress}%` }"> Completed</div>
+            </div>
+            </p>
+        </div>
+
+        <div class="text-blue-600 mt-3 mr-5 ml-5 flex justify-between mb-4 dark:bg-zinc-700 dark:text-blue-500">
+            <div class="flex items-center">
+                <svg viewBox="0 0 24 24" width="25" height="25" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M22 12C22 12 21.0071 12.8907 19.0212 13.6851L16.2127 14.8085C14.2268 15.6028 13.2339 16 12 16C10.7661 16 9.77318 15.6028 7.7873 14.8085L4.97883 13.6851C2.99294 12.8907 2 12 2 12"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                        <path
+                            d="M2 16C2 16 2.99294 16.8907 4.97883 17.6851L7.7873 18.8085C9.77318 19.6028 10.7661 20 12 20C12.9539 20 13.7639 19.7626 15 19.2878M19.0212 17.6851C21.0071 16.8907 22 16 22 16"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                        <path
+                            d="M4.97883 6.31492C2.99294 7.10927 2 7.50645 2 8C2 8.49355 2.99294 8.89073 4.97883 9.68508L7.7873 10.8085C9.77318 11.6028 10.7661 12 12 12C13.2339 12 14.2268 11.6028 16.2127 10.8085L19.0212 9.68508C21.0071 8.89073 22 8.49355 22 8C22 7.50645 21.0071 7.10927 19.0212 6.31492L16.2127 5.19153C14.2268 4.39718 13.2339 4 12 4C11.0461 4 10.2361 4.2374 9 4.71221"
+                            stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+                    </g>
+                </svg>
+                <span class="text-black ml-2 dark:text-white">{{ course.lessons_count }} Lessons</span>
+            </div>
+            <div class="flex items-center">
+                <svg fill="currentColor" width="21" height="21" viewBox="0 0 24 24" id="Layer_1" data-name="Layer 1"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                    <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            d="M24,12A12,12,0,0,1,0,12a1,1,0,0,1,2,0A10,10,0,1,0,12,2a1,1,0,0,1,0-2A12.013,12.013,0,0,1,24,12ZM10.277,11H8a1,1,0,0,0,0,2h2.277A1.994,1.994,0,1,0,13,10.277V7a1,1,0,0,0-2,0v3.277A2,2,0,0,0,10.277,11ZM1.827,8.784a1,1,0,1,0-1-1A1,1,0,0,0,1.827,8.784ZM4.221,5.207a1,1,0,1,0-1-1A1,1,0,0,0,4.221,5.207ZM7.779,2.841a1,1,0,1,0-1-1A1,1,0,0,0,7.779,2.841Z">
+                        </path>
+                    </g>
+                </svg>
+                <span class="text-black ml-2 dark:text-white">{{ estimatedTime(course.lessons_count) }}</span>
+            </div>
+        </div>
+        </Link> 
+
+        <button class="absolute top-4 right-6 z-10 text-red-700 hover:text-red-600 rounded-full p-1" @click="favorite(course.id)"
+            v-if="where !== 'home' && cmid == null">
+            <svg v-if="course.favorite" xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24"
+                fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="square"
+                stroke-linejoin="bevel">
+                <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                </path>
+            </svg>
+            <svg v-else xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel">
+                <path
+                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                </path>
+            </svg>
+        </button>
+    </div>
+</template>

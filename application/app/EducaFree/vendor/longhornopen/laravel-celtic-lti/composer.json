@@ -1,0 +1,28 @@
+{
+  "name": "longhornopen/laravel-celtic-lti",
+  "type": "library",
+  "description": "A Laravel wrapper for https://github.com/celtic-project/LTI-PHP",
+  "keywords": ["laravel","lti","celtic-project"],
+  "homepage": "https://github.com/longhornopen/",
+  "license": "LGPL-3.0-or-later",
+  "require": {
+    "ext-pdo": "*",
+    "longhornopen/lti": "^5.0",
+    "illuminate/support": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "LonghornOpen\\LaravelCelticLTI\\": "src"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "LonghornOpen\\LaravelCelticLTI\\LtiServiceProvider"
+      ],
+      "aliases": {
+        "LTI": "LonghornOpen\\LaravelCelticLTI\\LtiFacade"
+      }
+    }
+  }
+}

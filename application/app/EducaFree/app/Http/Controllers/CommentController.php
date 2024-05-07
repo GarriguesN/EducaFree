@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CommentRequest;
 use App\Models\Comment;
+use App\Models\CommentLike;
 use App\Models\CommentReply;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -77,7 +78,6 @@ class CommentController extends Controller
 
     public function deleteReply($id, $idCourse)
     {
-        dd('hola');
         // Encuentra la respuesta por su ID
         $reply = CommentReply::findOrFail($id);
 
@@ -88,13 +88,50 @@ class CommentController extends Controller
         return Inertia::location(route('course', $idCourse));
     }
 
-    //Funcion que devulve un json con todos los datos de los comentarios de un curso ($id)
-    public function dataCourseComments($id)
-    {
+    //Funcion para dar like a un comentario (no reply)
+    public function addFavorites($id, Request $request, $idCourse){
+        $user = $request->user();
 
-        $comments = Comment::with('user', 'replies.user')
+        $like = CommentLike::where('user_id', $user->id)
+        ->where('comment_id', $id)
+        ->first();
+
+        if ($like) {
+            // If the user has already liked the comment, remove the like
+            CommentLike::where('user_id', $user->id)
+            ->where('comment_id', $id)
+            ->delete();
+        } else {
+            // If the user has not liked the comment, add a new like
+            $newLike = new CommentLike();
+            $newLike->user_id = $user->id;
+            $newLike->comment_id = $id;
+            $newLike->save();
+        }
+    
+
+        return Inertia::location(route('course', $idCourse));
+    }
+
+    //Funcion que devulve un json con todos los datos de los comentarios de un curso ($id)
+    public function dataCourseComments($id, Request $request)
+    {
+        // Retrieve the userId from the request query
+        $userId = $request->query('userId');
+        // Retrieve comments with user, replies.user relationships, and favorites count
+        $comments = Comment::with(['user', 'replies.user'])
+            ->withCount('favorites') // Count the favorites for each comment
             ->where('course_id', $id)
-            ->paginate(5);
+            ->orderBy('favorites_count', 'desc') // Order by favorites count
+            ->paginate(5); // Paginate the results
+
+        // Include the favorite status for the current user
+        $comments->each(function($comment) use ($userId) {
+            // Check if the user has favorited the comment
+            $comment->is_favorited = $comment->favorites()
+                ->where('user_id', $userId)
+                ->exists();
+        });
 
         return response()->json([
             'comments' => $comments,

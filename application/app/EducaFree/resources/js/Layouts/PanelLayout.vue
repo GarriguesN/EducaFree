@@ -1,5 +1,6 @@
 <script setup>
 import ArticleSide from '../Components/AdminPanel/Sidebar.vue';
+import ToggleDark from  '../Components/ToggleDark.vue';
 </script>
 
 <script>
@@ -19,4 +20,5 @@ export default  {
 
     </ArticleSide>
 </main>
+<ToggleDark :alwaysLight="true"></ToggleDark>
 </template>

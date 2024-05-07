@@ -7,6 +7,6 @@
 <template>
     <Head title="Upload"/>
     <Layout title="Upload">
-        <Upload />
+        <Upload/>
     </Layout>
 </template>

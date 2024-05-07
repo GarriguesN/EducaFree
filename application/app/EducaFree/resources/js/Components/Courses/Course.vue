@@ -6,6 +6,7 @@ import Modal from '../Modal.vue';
 import Pagination from "@/Components/Pagination.vue";
 import { ref, onMounted, onUnmounted } from 'vue';
 
+
 //Definición de los props
 const props = defineProps({
     course: {
@@ -29,6 +30,7 @@ const editVisibleReply = ref(false);
 let isLoading = ref(false);
 let showModalDelete = ref(false);
 let showModalReport = ref(false);
+const pageProp = usePage();
 
 //Definición de los formularios
 const form = useForm({
@@ -71,8 +73,10 @@ const replyComment = (commentId) => {
 // Función asíncrona para obtener los comentarios del curso
 const getResults = async (page = 1) => {
     isLoading.value = true;
-    const response = await fetchCourseCommentsData(props.course.id, page);
+    console.log(pageProp.props.auth.user.id);
+    const response = await fetchCourseCommentsData(props.course.id, page, 5, pageProp.props.auth.user.id);
     comments.value = await response
+    console.log(response)
     countComments.value = await response.total ;
     isLoading.value = false;
 }
@@ -121,7 +125,7 @@ const deleteComment = () => {
 // Funcion para eliminar la respuesta
 const deleteReply = () => {
     let idReply = id.value
-    router.delete(route('course.deleteReply', { id: idReply, idCourse: idCourse.value }),{
+    router.delete(route('course.deleteReply', { id: idReply, idCourse: idCourse.value }), {
         preserveScroll: true,
         preserveState: true
     })
@@ -159,7 +163,10 @@ const openReport = (selectedId, selectedType) => {
 //Funcion para enviar el reporte a la base de datos
 const postReport = (idR, typeR, reasonR) => {
     console.log(reasonR, idR, typeR);
-    router.post(route('comment.report', { id: idR, type: typeR, reason: reasonR }))
+    router.post(route('comment.report', { id: idR, type: typeR, reason: reasonR }),{},{
+        preserveScroll: true,
+        preserveState: true
+    })
     showModalReport.value = false;
 }
 
@@ -175,6 +182,13 @@ if(usePage().props.lessons.length == 1){
                 .catch(error => {
                     console.error('Error:', error);
                 });
+}
+
+const favorite = (id) => {
+    router.post(route('comments.addFavorites', [id, idCourse.value]), {}, {
+        preserveScroll: true,
+        preserveState: true
+    })
 }
 
 </script>
@@ -235,8 +249,7 @@ if(usePage().props.lessons.length == 1){
             </div>
         </div>
     </section>
-
-    <section v-if="cmid == null" class="bg-white border-t-2 flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700 dark:border-gray-600">
+    <section v-if="cmid == null && $page.props.auth.user.email_verified_at != null" class="bg-white border-t-2 flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700 dark:border-gray-600">
         <div class="border-b dark:border-gray-600">
             <Form :form="form" @submit="addComment"></Form>
         </div>
@@ -255,14 +268,35 @@ if(usePage().props.lessons.length == 1){
                             {{ new Date(comment.created_at).toDateString() }}
                         </p>
                     </div>
+                    <div class="flex justify-center items-center">
                         <div v-if="($page.props.auth.user.roles && $page.props.auth.user.roles[0]?.name || 'none') === 'admin' || $page.props.auth.user.id == comment.user_id" class="flex items-center text-sm text-gray-400 dark:text-gray-300">
-                                    <p @click="openEditComment(comment.id, comment.comment)" class="m-1 hover:text-blue-700 cursor-pointer">Edit</p>
-                                    <p>/</p>
-                                    <p @click="openDelete(comment.id, 'comment')" class="m-1 hover:text-red-700 cursor-pointer">Delete</p>
+                            <p @click="openEditComment(comment.id, comment.comment)" class="m-1 hover:text-blue-700 cursor-pointer">Edit</p>
+                            <p>/</p>
+                            <p @click="openDelete(comment.id, 'comment')" class="m-1 hover:text-red-700 cursor-pointer">Delete</p>
                         </div>
-                        <div v-else class="flex items-center text-sm  text-gray-300">
+                        <div v-else class="flex items-center text-sm  text-gray-400">
                             <p @click="openReport(comment.id, 'comment')" class="m-1 hover:text-black cursor-pointer">Report</p>
                         </div>
+                        <!-- Add the favorite button here -->
+                        <button @click="favorite(comment.id)" class="m-1 text-red-700 hover:text-red-500 cursor-pointer">
+                            <svg v-if="comment.is_favorited" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
+                                fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linecap="square"
+                                stroke-linejoin="bevel">
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                </path>
+                            </svg>
+                            <svg v-else xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel">
+                                <path
+                                    d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z">
+                                </path>
+                            </svg>
+                        </button>
+
+                        <p class="text-sm text-gray-600 dark:text-gray-400">{{ comment.favorites_count }} Likes</p>
+                    </div>
+                    
                 </div>
                 <p class="text-gray-500 dark:text-gray-200" :class="editVisibleComment === comment.id   ? 'hidden' : ''">{{ comment.comment }}</p>
                 <Form v-if="editVisibleComment === comment.id" :form="formEditComment" @submit="editComment(comment.id)" :edit="true"></Form>
@@ -322,7 +356,7 @@ if(usePage().props.lessons.length == 1){
     </section>
 
 
-    <a class="fixed end-6 bottom-1 md:bottom-6  group" :href="'/course/pdf/' + course.id">
+    <a class="fixed end-6 bottom-1 md:bottom-6  group" :href="'/course/pdf/' + course.id" v-if="$page.props.auth.user.email_verified_at != null">
         <button type="button" data-tooltip-placement="left"
             class="flex justify-center items-center w-[52px] h-[52px] dark:bg-zinc-700 dark:text-gray-200 text-gray-500 hover:text-blue-700 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50">
             <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"

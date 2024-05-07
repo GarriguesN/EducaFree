@@ -106,6 +106,10 @@
             <AlertVerify v-if="$page.props.auth.user.email_verified_at == null" :glowing="glowing" :status="status"></AlertVerify>
       </div>
     </nav>
+
+    <div v-if="requests">
+      <Banner v-if="showIt" class="!fixed !top-36" :class="showIt ? 'block' : 'hidden'" @close="close" @update:glowing="handleLinkClick" :requests="requests"></Banner>
+    </div>
   </template>
   
   <script setup>
@@ -115,13 +119,15 @@
   import logo from '../../../../public/images/icon/logo.svg';
   import NavLink from '../NavLink.vue';
   import AlertVerify from '@/Components/AlertVerify.vue';
+  import Banner from '@/Components/Banner.vue';
 
 
   //Definición de props
   defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
-    status: String
+    status: String,
+    requests: Array
   });
 
   // Función para cerrar sesion
@@ -133,7 +139,7 @@
   const glowing = ref(false);
   const page = usePage();
 
-// Function to handle scroll events
+// Funcion para el scroll
 function handleScroll() {
   if (window.scrollY > 80) {
     isScrolledDown.value = true;
@@ -142,25 +148,60 @@ function handleScroll() {
   }
 }
 
+// Funcion para remarcar el aviso
 function handleLinkClick() {
-  console.log('hola')
   if(page.props.auth.user != null){
       if (page.props.auth.user.email_verified_at == null) {
-      // Set shouldGlow to true to activate the glowing effect
+      // Activar el efecto
       glowing.value = true;
 
       console.log('glowing')
-      // Optionally, you can add a delay to remove the glow effect after some time
+      // Delay para que el brillo desaparezca
       setTimeout(() => {
         glowing.value = false;
-      }, 1000); // Adjust the delay as needed (e.g., 2 seconds)
+      }, 1000); 
     }
   }
-  
+}
+
+const showBannerKey = 'showBannerAlert';
+const showIt = ref(false);
+
+function checkTimeBanner() {
+    const lastTime = localStorage.getItem(showBannerKey);
+    const currentTime = new Date().getTime();
+    
+    if (!lastTime) {
+        return true;
+    }
+    return currentTime - parseInt(lastTime, 10) > 86400000;
+}
+
+function showBanner(){
+  showIt.value = true;
+
+  // const currentTime = new Date().getTime();
+  // localStorage.setItem(showBannerKey, currentTime.toString());
+}
+
+function close() {
+  console.log('Closing banner');
+    showIt.value = false;
+    const currentTime = new Date().getTime();
+    localStorage.setItem(showBannerKey, currentTime.toString());
+    console.log('showIt state:', showIt.value);
 }
 
 onMounted(() => {
+  console.log(showIt.value)
   window.addEventListener('scroll', handleScroll);
+  console.log('aaa')
+  if(checkTimeBanner()){
+    console.log('aaa')
+    showBanner();
+  }else{
+    console.log('bbb')
+  }
 });
 
 onUnmounted(() => {

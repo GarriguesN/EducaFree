@@ -9,11 +9,12 @@ const axiosInstance = axios.create({
 });
 
 // Definir una función para obtener datos de requests
-const fetchRequestData = async (searchTerm = '') => {
+const fetchRequestData = async (searchTerm = '', nocompleted) => {
   try {
     const response = await axiosInstance.get('/data', {
       params: {
-        searchTerm: searchTerm
+        searchTerm: searchTerm,
+        completed: nocompleted
       }
     });
     

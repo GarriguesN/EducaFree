@@ -32,4 +32,10 @@ class Comment extends Model
     {
         return $this->hasMany(CommentReply::class);
     }
+
+    // Relación con los likes de este comentario
+    public function favorites()
+    {
+        return $this->hasMany(CommentLike::class);
+    }
 }

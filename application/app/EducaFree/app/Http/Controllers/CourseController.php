@@ -218,4 +218,30 @@ class CourseController extends Controller
         $course->save();
         return Inertia::location(route('dashboard.pendingCourses'));
     }
+
+    public function dataPendings(Request $request)
+    {
+        // Obtain the user ID from the request
+        $userId = $request->input('userId');
+    
+        // Validate userId input
+        if (!$userId) {
+            return response()->json([
+                'error' => 'User ID is required.'
+            ], 400);
+        }
+    
+        // Query the database for pending courses uploaded by the user
+        $pendingCourses = Course::where('uploader', $userId)
+            ->where('revision_status', 'pending')
+            ->first();
+    
+        // Determine whether there are any pending courses
+        
+    
+        // Return a JSON response indicating whether there are pending courses
+        return response()->json([
+            'hasPendingCourses' => $pendingCourses,
+        ]);
+    }
 }

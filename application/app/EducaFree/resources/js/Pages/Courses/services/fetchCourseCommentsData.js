@@ -9,20 +9,21 @@ const axiosInstance = axios.create({
 });
 
 // Función para obtener los comentarios del curso con el ID especificado
-const fetchCourseCommentsData = async (id, page, perPage = 5) => {
-    try {
+const fetchCourseCommentsData = async (id, page, perPage = 5, userId) => {
+  try {
       const response = await axiosInstance.get(`/data/${id}?page=${page}`, {
-        params: {
-          page,
-          perPage,
-        },
+          params: {
+              page,
+              perPage,
+              userId,
+          },
       });
-  
+
       return response.data.comments;
-    } catch (error) {
+  } catch (error) {
       console.error('Error fetching course comments data:', error);
       throw error;
-    }
-  };
+  }
+};
   
   export { fetchCourseCommentsData };

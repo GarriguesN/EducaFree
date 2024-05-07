@@ -360,6 +360,8 @@ class DashboardController extends Controller
     {
         $title = '';
         $requestCriteria = [];
+        $completed = $request->input('completed', false);
+
 
         // Si el usuario ha enviado una búsqueda, agregarla a la consulta
         if ($request->has("searchTerm")) {
@@ -372,7 +374,6 @@ class DashboardController extends Controller
 
         // Creamos una consulta de las requests
         $query = ModelsRequest::query();
-
         // Aplicar los criterios de búsqueda
         foreach ($requestCriteria as $column => $value) {
             // Si el valor es una cadena y contiene el símbolo de porcentaje,
@@ -384,8 +385,14 @@ class DashboardController extends Controller
             }
         }
 
-        // Recoger las requests ordenadas por fecha de creación y por si están completadas o no
-        $requests = $query->orderBy('completed')->orderByDesc('created_at')->get();
+        if ($completed) {
+            $requests = ModelsRequest::where('completed', 0)->get();
+        }else{
+            // Recoger las requests ordenadas por fecha de creación y por si están completadas o no
+            $requests = $query->orderBy('completed')->orderByDesc('created_at')->get();
+        }
+
+
 
         return response()->json([
             'requests' => $requests,

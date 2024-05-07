@@ -95,6 +95,7 @@ Route::middleware([
     Route::post('/course/report/{id}/{type}/{reason}', [ReportController::class, 'report'])->name('comment.report');
     Route::post('/course/updateInfo/{id}', [CourseController::class, 'updateInfo'])->name('courses.updateInfo');
     Route::post('/course/addFavorites/{id}', [CourseController::class, 'addFavorites'])->name('courses.addFavorites');
+    Route::post('/course/comment/addFavorites/{id}/{idCourse}', [CommentController::class, 'addFavorites'])->name('comments.addFavorites');
     Route::post('/course/comment/{id}', [CommentController::class, 'comment'])->name('course.comment');
     Route::post('/course/replyComment/{id}', [CommentController::class, 'replyComment'])->name('course.replyComment');
     Route::put('/course/editComment/{id}', [CommentController::class, 'editComment'])->name('course.editComment');
@@ -102,7 +103,10 @@ Route::middleware([
     Route::delete('/course/deleteComment/{id}/{idCourse}', [CommentController::class, 'deleteComment'])->name('course.deleteComment');
     Route::delete('/course/deleteReply/{id}/{idCourse}', [CommentController::class, 'deleteReply'])->name('course.deleteReply');
 
-    Route::get('/upload', [HomeController::class, 'upload'])->name('upload');
+    Route::get('/pendingCourse/delete', [HomeController::class, 'deletePendingCourse'])->name('pendingcourse.delete');
+    Route::get('/pendingCourse/delete/new', [HomeController::class, 'deletePendingCourseNew'])->name('pendingcourse.deletenew');
+
+    Route::get('/upload/{id?}/{name?}/{description?}', [HomeController::class, 'upload'])->name('upload');
     Route::get('/uploadAP', [DashboardController::class, 'upload'])->name('uploadAP');
 
     //Rutas Home
@@ -126,4 +130,9 @@ Route::middleware([
     Route::put('/user/profile/updatePassword/{id}', [UserController::class, 'updatePassword'])->name('user.updatePassword');
     Route::delete('/user/profile/delete/{id}', [UserController::class, 'deleteYourself'])->name('user.deleteYourself');
 });
+
+//Mismas rutas fuera del middleware para poder utilizar sus metodos sin la necesidad de estar verificados
+Route::put('/user/profile/update/{id}', [UserController::class, 'updateInfo'])->name('user.update');
+Route::put('/user/profile/updatePassword/{id}', [UserController::class, 'updatePassword'])->name('user.updatePassword');
+Route::delete('/user/profile/delete/{id}', [UserController::class, 'deleteYourself'])->name('user.deleteYourself');
 

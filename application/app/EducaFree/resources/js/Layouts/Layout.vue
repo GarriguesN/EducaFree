@@ -2,6 +2,7 @@
 import Navbar from '../Components/Header-nav-footer/Navbar.vue';
 import Footer from '../Components/Header-nav-footer/Footer.vue';
 import ToggleDark from  '../Components/ToggleDark.vue';
+import { fetchRequestData } from '@/Pages/AdminPanel/services/fetchRequestsData';
 
 // Definicion de props
 defineProps({
@@ -10,23 +11,35 @@ defineProps({
         default: null
     }
 })
+const requests = ref({})
+onMounted(async () => {
+    try {
+        requests.value = await fetchRequestData('', true);
+    
+    } catch (error) {
+        console.error('Error fetching request data:', error);
+    }
+    });
 </script>
 
 <script>
+
+
 // Importar y ejecutar la inicializacion de flowbite para algunos componentes
 import { initFlowbite } from "flowbite";
+import { onMounted, ref } from 'vue';
 export default  {
     mounted() {
         initFlowbite();
     },
 }
+
 </script>
 
 <template>
 <main>
-
     <header>
-        <Navbar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" />
+        <Navbar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" :requests="requests" />
     </header>
 
     

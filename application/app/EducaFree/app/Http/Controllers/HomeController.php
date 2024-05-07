@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 
 
@@ -124,15 +125,28 @@ class HomeController extends Controller
             $yes = true;
         } else {
             // Si no existe se crea un curso nuevo para que pueda editarlo
-            $newcourse = new Course();
-            $newcourse->name = 'My first Course';
-            $newcourse->description = 'This is my first Course, you can edit me!';
-            $newcourse->vision = false;
-            $newcourse->img = null;
-            $newcourse->uploader = $request->user()->id;
-            $newcourse->revision_status = 'pending';
-            $newcourse->save();
-            $course_id = $newcourse->id;
+            // dd($request->all());
+            if($request->has('title') && $request->has('description')){
+                $newcourse = new Course();
+                $newcourse->name = $request->title;
+                $newcourse->description = $request->description;
+                $newcourse->vision = false;
+                $newcourse->img = null;
+                $newcourse->uploader = $request->user()->id;
+                $newcourse->revision_status = 'pending';
+                $newcourse->save();
+                $course_id = $newcourse->id;
+            }else{
+                $newcourse = new Course();
+                $newcourse->name = 'My first Course';
+                $newcourse->description = 'This is my first Course, you can edit me!';
+                $newcourse->vision = false;
+                $newcourse->img = null;
+                $newcourse->uploader = $request->user()->id;
+                $newcourse->revision_status = 'pending';
+                $newcourse->save();
+                $course_id = $newcourse->id;
+            }
         }
 
         // Recogemos los datos del curso que se esta editando
@@ -152,6 +166,33 @@ class HomeController extends Controller
             'pending' => $yes,
             'count' => $count
         ]);
+    }
+
+    public function deletePendingCourse(Request $request){
+
+        $pendingCourse = Course::where('uploader', $request->user()->id)
+            ->where('revision_status', 'pending')
+            ->first();
+
+        if($pendingCourse){
+            $pendingCourse->delete();
+        }
+
+        return Inertia::location(route('home'));
+    }
+
+    public function deletePendingCourseNew(Request $request){
+        $ok = false;
+        $pendingCourse = Course::where('uploader', $request->user()->id)
+            ->where('revision_status', 'pending')
+            ->first();
+
+        if($pendingCourse){
+            $pendingCourse->delete();
+            $ok = true;
+        }
+
+        return response()->json(['ok' => $ok], 200);
     }
 
     public function dataCourses(Request $request)

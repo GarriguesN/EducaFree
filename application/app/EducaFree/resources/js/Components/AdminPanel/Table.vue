@@ -160,6 +160,12 @@
         id.value = null;
     }
 
+    const giveCollaborator = () => {
+        router.post(route('user.giveCollaborator', id.value))
+        showModalWarning.value  = false
+        id.value = null;
+    }
+
     // Función para eliminar los roles de un usuario
     const deleteRoles = () => {
         router.post(route('user.deleteRoles', id.value))
@@ -225,7 +231,8 @@
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500  ">Are you sure you want to give permissions?</h3>
                     <button v-if="selectedRole == 'admin'" @click="giveAdmin" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300   font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Yes, give permission</button>
-                    <button v-else @click="giveEditor" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300   font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Yes, give permission</button>
+                    <button v-else-if="selectedRole == 'editor'" @click="giveEditor" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300   font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Yes, give permission</button>
+                    <button v-else @click="giveCollaborator" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300   font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Yes, give permission</button>
                 <button @click="showModalWarning=false" type="button" class="py-2.5 px-5 ms-3 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100           ">No, cancel</button>
             </div>
 
@@ -365,8 +372,9 @@
                     {{ item.roles[0] ? item.roles[0].name : 'user'}}
                 </td>
                 <td v-if="!item.roles[0]" class="px-6 py-4 text-center flex justify-evenly">
-                    <a v-if="(item.roles[0] && !item.roles[0].name.includes('admin')) || !item.roles[0]" @click="openWarning(item.id, 'admin')" href="#" class="font-medium text-blue-600 hover:underline cursor-pointer">Admin</a>
-                    <a v-if="(item.roles[0] && !item.roles[0].name.includes('editor'))  || !item.roles[0]" @click="openWarning(item.id, 'editor')" href="#" class="font-medium text-green-600 hover:underline cursor-pointer">Editor</a>
+                    <a v-if="(item.roles[0] && !item.roles[0].name.includes('admin')) || !item.roles[0]" @click="openWarning(item.id, 'admin')" href="#" class="font-medium text-red-600 hover:underline cursor-pointer">Admin</a>
+                    <a v-if="(item.roles[0] && !item.roles[0].name.includes('editor'))  || !item.roles[0]" @click="openWarning(item.id, 'editor')" href="#" class="font-medium text-yellow-400 hover:underline cursor-pointer">Editor</a>
+                    <a v-if="(item.roles[0] && !item.roles[0].name.includes('collaborator'))  || !item.roles[0]" @click="openWarning(item.id, 'collaborator')" href="#" class="font-medium text-blue-600 hover:underline cursor-pointer">Collaborator</a>
                 </td>
                 <td v-else class="px-6 py-4 text-center flex justify-evenly">
                     No roles to assign

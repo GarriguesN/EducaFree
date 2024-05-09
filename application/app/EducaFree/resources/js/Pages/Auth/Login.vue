@@ -28,6 +28,8 @@ const submit = () => {
         onFinish: () => form.reset('password'), // Al finalizar el envio, resetea el campo de password
     });
 };
+
+
 </script>
 
 <template>

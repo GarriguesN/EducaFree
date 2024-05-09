@@ -16,7 +16,8 @@ const props = defineProps({
     }
 })
 
-const urlBase = 'http://192.168.1.128/storage/ImagesCourses/';
+const autoURL = window.location.origin;
+const urlBase = `${autoURL}/storage/ImagesCourses/`;
 
 //Funcion para guardar el ultimo curso visitado
 function saveLastVisitedCourse(courseId, courseName) {

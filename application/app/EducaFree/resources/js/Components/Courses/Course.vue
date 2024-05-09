@@ -4,7 +4,7 @@ import { fetchCourseCommentsData } from "@/Pages/Courses/services/fetchCourseCom
 import { router, useForm, usePage } from '@inertiajs/vue3';
 import Modal from '../Modal.vue';
 import Pagination from "@/Components/Pagination.vue";
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
 
 
 //Definición de los props
@@ -31,6 +31,11 @@ let isLoading = ref(false);
 let showModalDelete = ref(false);
 let showModalReport = ref(false);
 const pageProp = usePage();
+const open = ref(false);
+const chat = ref([]);
+const textChat = ref('');
+const thinking = ref(false);
+const change = ref(false);
 
 //Definición de los formularios
 const form = useForm({
@@ -73,10 +78,8 @@ const replyComment = (commentId) => {
 // Función asíncrona para obtener los comentarios del curso
 const getResults = async (page = 1) => {
     isLoading.value = true;
-    console.log(pageProp.props.auth.user.id);
-    const response = await fetchCourseCommentsData(props.course.id, page, 5, pageProp.props.auth.user.id);
+    const response = await fetchCourseCommentsData(props.course.id, page, 5, pageProp.props.auth?.user?.id);
     comments.value = await response
-    console.log(response)
     countComments.value = await response.total ;
     isLoading.value = false;
 }
@@ -162,7 +165,6 @@ const openReport = (selectedId, selectedType) => {
 
 //Funcion para enviar el reporte a la base de datos
 const postReport = (idR, typeR, reasonR) => {
-    console.log(reasonR, idR, typeR);
     router.post(route('comment.report', { id: idR, type: typeR, reason: reasonR }),{},{
         preserveScroll: true,
         preserveState: true
@@ -191,9 +193,41 @@ const favorite = (id) => {
     })
 }
 
+const openSide = () => {
+open.value = !open.value;
+change.value = !change.value;
+}
+
+const sendPrompt = async () => {
+    if(textChat.value.trim() == ''){
+        alert('No puedes enviar un comentario vacío');
+        return
+    }else{
+        chat.value.push({ message: textChat.value , sender: 'You'});
+        let prompt = textChat.value
+        textChat.value = '';
+        thinking.value = true
+        try {
+            // Fetch the AI response
+            console.log(textChat.value)
+            const aiResponse = await fetchChatAiData(prompt);
+
+            // Add the AI's response to the chat
+            chat.value.push({ message: aiResponse, sender: 'AI' });
+
+            // Clear the text input
+            thinking.value = false
+        } catch (error) {
+            console.error('Error fetching AI data:', error);
+        }
+        
+    }
+}
+
 </script>
 
 <template>
+    <!-- CABECERA -->
     <section class="bg-white h-[21rem] flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700">
         <div @click="back" class="cursor-pointer m-4 ml-10 mb-10 text-blue-700 dark:text-blue-500 dark:hover:text-white hover:text-black w-8">
             <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><path d="M19 12H6M12 5l-7 7 7 7"/></svg>
@@ -201,10 +235,11 @@ const favorite = (id) => {
         <p class="text-center text-5xl font-[1000] mb-10">{{ course.name }}</p>
     </section>
 
+    <!-- LECCIONES -->
     <section id="lessons">
         <div class="container px-5 py-16 mx-auto sm:px-20">
-            <div class="md:flex w-full h-full">
-                <div class="border-b border-gray-200 min-w-52 dark:border-gray-600">
+            <div class="md:flex h-full" :class="open ? 'w-[70rem]': 'w-full'">
+                <div class="border-b border-gray-200 min-w-52 dark:border-gray-600" :class="open ? 'w-[20rem]': ''">
                     <ul class="flex-col text-sm font-medium text-gray-500 md:me-4 md:mb-0 min-w-full"
                         id="default-styled-tab" data-tabs-toggle="#default-styled-tab-content"
                         data-tabs-active-classes="text-blue-700 dark:text-blue-500 hover:text-blue-700 border-blue-700"
@@ -223,7 +258,7 @@ const favorite = (id) => {
 
                 </div>
                 <div id="default-styled-tab-content"
-                    class="bg-gray-50 text-medium text-gray-500 rounded-lg w-full max-w-full dark:bg-zinc-600">
+                    class="bg-gray-50 text-medium text-gray-500 rounded-lg w-full max-w-full dark:bg-zinc-600" :class="open ? 'w-[80rem]': 'w-full'">
                     <div v-if="$page.props.lessons.length > 0" v-for="(lesson, index) in $page.props.lessons" :key="index"
                         :class="{ hidden: activeTab !== index }" class="p-4 rounded-lg bg-gray-50 dark:bg-zinc-600 max-w-full"
                         :id="'lesson-content-' + index" role="tabpanel" :aria-labelledby="'lesson-tab-' + index">
@@ -248,8 +283,68 @@ const favorite = (id) => {
                 </div>
             </div>
         </div>
+
+        <!-- CHAT -->
+    <div class="hidden min-[1300px]:block">
+        <button @click="openSide" id="chatButton" type="button" class="absolute top-[336px] right-5 inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg hover:text-blue-700  dark:text-gray-400 dark:hover:text-blue-500">
+            <span v-if="!change" class="inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <p class="mx-2">Chat with AI</p>
+            </span>
+            <span v-else id="closeSpan" class="inline-flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="hover:text-red-600" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                <p class="mx-2">Close chat</p>
+            </span>
+            
+        </button>
+
+        <aside
+            :class="open ? '  opacity-100 -translate-x-0 block' : ' opacity-0 -translate-x-full hidden'"
+            class="absolute top-[385px] right-5 z-40 w-[30rem] h-[689px] transition-all delay-700 duration-500 ease-in"
+        >
+            
+            <div class="h-full px-3 py-5 pt-0.5 border dark:border-gray-600 bg-gray-50 dark:bg-zinc-700">
+                <p class="text-xs text-gray-600 text-center dark:text-gray-300">Chat history will be automatically deleted when you leave this course</p>
+                <!-- CHAT -->
+                <div class="h-[92%]  px-3 py-4 overflow-y-auto shadow-inner border dark:border-gray-600 bg-white dark:bg-zinc-600 dark:shadow-inner">
+                    <div v-for="message in chat" class="text-wrap flex flex-col gap-1 w-full mt-1 ">
+                        <div class="flex items-center space-x-2 ">
+                            <span class="text-sm font-semibold text-gray-900 dark:text-white">{{message.sender}}</span>
+                        </div>
+                        <div class="flex flex-col leading-1.5 w-full p-4 border-gray-200 bg-gray-100 rounded-e-xl rounded-es-xl dark:bg-zinc-700">
+                            <p v-if="message.message.type=='error' && message.message.AI" class="break-words text-sm flex font-normal text-red-700 dark:text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                                {{message.message.response}}
+                            </p>
+                            <p v-if="message.message.AI && message.message.type=='ok'" class="break-words text-sm font-normal text-gray-900 dark:text-white">{{message.message.response}} </p>
+                            <p v-if="!message.message.AI" class="break-words text-sm font-normal text-gray-900 dark:text-white" :class="message.type ? 'text-red-600':''">{{message.message}} </p>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="relative w-full my-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" class="absolute left-3 top-1/2 size-4 -translate-y-1/2 fill-blue-700 dark:fill-blue-500">
+                        <path fill-rule="evenodd" d="M5 4a.75.75 0 0 1 .738.616l.252 1.388A1.25 1.25 0 0 0 6.996 7.01l1.388.252a.75.75 0 0 1 0 1.476l-1.388.252A1.25 1.25 0 0 0 5.99 9.996l-.252 1.388a.75.75 0 0 1-1.476 0L4.01 9.996A1.25 1.25 0 0 0 3.004 8.99l-1.388-.252a.75.75 0 0 1 0-1.476l1.388-.252A1.25 1.25 0 0 0 4.01 6.004l.252-1.388A.75.75 0 0 1 5 4ZM12 1a.75.75 0 0 1 .721.544l.195.682c.118.415.443.74.858.858l.682.195a.75.75 0 0 1 0 1.442l-.682.195a1.25 1.25 0 0 0-.858.858l-.195.682a.75.75 0 0 1-1.442 0l-.195-.682a1.25 1.25 0 0 0-.858-.858l-.682-.195a.75.75 0 0 1 0-1.442l.682-.195a1.25 1.25 0 0 0 .858-.858l.195-.682A.75.75 0 0 1 12 1ZM10 11a.75.75 0 0 1 .728.568.968.968 0 0 0 .704.704.75.75 0 0 1 0 1.456.968.968 0 0 0-.704.704.75.75 0 0 1-1.456 0 .968.968 0 0 0-.704-.704.75.75 0 0 1 0-1.456.968.968 0 0 0 .704-.704A.75.75 0 0 1 10 11Z" clip-rule="evenodd" />
+                    </svg>
+                    <input v-if="!thinking" type="text" v-model="textChat" class="w-full border-outline bg-white border border-gray-200 rounded-xl px-2 py-2.5 pl-10 pr-24 text-sm text-slate-700 l disabled:cursor-not-allowed disabled:opacity-75 dark:border-gray-700 dark:bg-zinc-600 dark:text-gray-300" name="prompt" placeholder="Ask AI ..." />
+                    <input v-else type="text" disabled class="w-full border-outline bg-white border border-gray-200 rounded-xl px-2 py-2.5 pl-10 pr-24 text-sm text-slate-700 l disabled:cursor-not-allowed disabled:opacity-75 dark:border-gray-700 dark:bg-zinc-600 dark:text-gray-300" name="prompt" placeholder="Thinking..." />
+                    <button v-if="!thinking" @click="sendPrompt" type="button" class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-blue-700 rounded-xl px-2 py-1 text-xs tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  active:opacity-100 active:outline-offset-0 dark:bg-blue-600 dark:text-slate-100 dark:focus-visible:outline-blue-600">Send</button>
+                    <button v-else @click="sendPrompt" type="button" disabled class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-blue-700 rounded-xl px-2 py-1 text-xs tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  active:opacity-100 active:outline-offset-0 dark:bg-blue-600 dark:text-slate-100 dark:focus-visible:outline-blue-600">
+                        <div class="animate-spin">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+
     </section>
-    <section v-if="cmid == null && $page.props.auth.user.email_verified_at != null" class="bg-white border-t-2 flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700 dark:border-gray-600">
+
+    <!-- COMENTARIOS -->
+    <div v-if="cmid == null">
+        <section v-if="$page.props.auth.user.email_verified_at != null" class="bg-white border-t-2 flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700 dark:border-gray-600">
         <div class="border-b dark:border-gray-600">
             <Form :form="form" @submit="addComment"></Form>
         </div>
@@ -347,16 +442,18 @@ const favorite = (id) => {
             <p class="text-xl pt-10 text-center">No comments!</p>
             <p class="text-lg pb-10 text-gray-400 text-center">Be the first!</p>
         </div>
-
+        
         <Pagination v-if="countComments > 0"
             :pagination="comments"
             @pagination-change-page="getResults"
         />
 
     </section>
+    </div>
+    
 
 
-    <a class="fixed end-6 bottom-1 md:bottom-6  group" :href="'/course/pdf/' + course.id" v-if="$page.props.auth.user.email_verified_at != null">
+    <a class="fixed end-6 bottom-1 md:bottom-6 z-50  group" :href="'/course/pdf/' + course.id" v-if="$page.props.auth?.user?.email_verified_at != null">
         <button type="button" data-tooltip-placement="left"
             class="flex justify-center items-center w-[52px] h-[52px] dark:bg-zinc-700 dark:text-gray-200 text-gray-500 hover:text-blue-700 bg-white rounded-full border border-gray-200 shadow-sm hover:bg-gray-50">
             <svg class="w-5 h-5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
@@ -416,6 +513,7 @@ const favorite = (id) => {
 <script>
 import { ref } from 'vue';
 import axios from "axios";
+import { fetchChatAiData } from "./services/fetchChatAiData";
 
 export default {
     data() {
@@ -439,3 +537,13 @@ export default {
     }
 };
 </script>
+
+<style>
+#chatButton:hover #closeSpan svg {
+    stroke: red;
+}
+
+#chatButton:hover #closeSpan p {
+    color: rgb(63, 131, 248); 
+}
+</style>

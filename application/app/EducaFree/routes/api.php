@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AIController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\DashboardController;
@@ -33,13 +34,24 @@ use Illuminate\Support\Facades\Route;
     Route::get('/comments/data/{id}', [CommentController::class, 'dataCourseComments'])->name('course.comments');
     Route::get('/courses/pending', [CourseController::class, 'dataPendings'])->name('coursesPendings.boolean');
 
-
     //Rutas datos dashboard
     Route::get('/courses/dashboard/data', [DashboardController::class, 'dataCourses'])->name('courses.dashboard.data');
     Route::get('/pendingcourses/dashboard/data', [DashboardController::class, 'dataPendingCourses'])->name('pendingcourses.dashboard.data');
     Route::get('/users/data', [DashboardController::class, 'dataUsers'])->name('users.data');
     Route::get('/requests/data', [DashboardController::class, 'dataRequests'])->name('requests.data');
     Route::get('/reports/data', [DashboardController::class, 'dataReports'])->name('reports.data');
+    Route::get('/users/count', [DashboardController::class, 'countUsersByTimeRange']);
+    Route::get('/courses/count', [DashboardController::class, 'countCoursesByTimeRange']);
+    Route::get('/requests/count', [DashboardController::class, 'countRequestsByTimeRange']);
+    Route::get('/mostliked/count', [DashboardController::class, 'countMostLikedByTimeRange']);
+    Route::get('/completed/count', [DashboardController::class, 'countCompletedByTimeRange']);
+    Route::get('/lticonsumer/count', [DashboardController::class, 'countLtiConsumerByTimeRange']);
 
     //Ruta subir archivos
     Route::post('/upload/image', [PointController::class, 'uploadImage']);
+
+    //Ruta para hacer peticiones a la AI
+    Route::post('/ai/request', [AIController::class, 'request']);
+
+    //Ruta para checkear email
+    Route::get('/checkemail/data', [UserController::class, 'checkEmail']);

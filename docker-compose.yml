@@ -13,6 +13,8 @@ services:
       - MYSQL_PASSWORD=admin
     ports:
       - '3306:3306'
+    networks:
+     - app_network
 
 
   phpmyadmin:
@@ -27,6 +29,8 @@ services:
       restart: always
     ports:
       - 8081:80
+    networks:
+      - app_network
 
 
   php-fpm:
@@ -37,6 +41,8 @@ services:
     volumes:
       - ./application/moodle:/var/www/html
     #  - ./phpdocker/php-fpm/php-ini-overrides.ini:/usr/local/etc/php/conf.d/overrides.ini
+    networks:
+      - app_network
 
   apache-httpd:
     container_name: apache
@@ -46,9 +52,11 @@ services:
     volumes:
       - ./application/moodle:/var/www/html
     ports:
-      - "8080:80"
+      - "8000:80"
     depends_on:
       - php-fpm
+    networks:
+      - app_network
 
   app:
     container_name: app
@@ -60,3 +68,9 @@ services:
       - ./application/config:/etc/apache2/sites-available
     ports:
       - "80:80"
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge

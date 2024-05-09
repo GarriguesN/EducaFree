@@ -53,5 +53,5 @@ export default  {
         <Footer />
     </footer>
 </main>
-<ToggleDark></ToggleDark>
+<ToggleDark v-if="cmid == null"></ToggleDark>
 </template>

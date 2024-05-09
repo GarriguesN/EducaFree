@@ -15,6 +15,7 @@ use Inertia\Inertia;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 use Laravel\Jetstream\Http\Controllers\Inertia\UserProfileController;
 use App\Http\Middleware\EnsureEmailIsVerified;
+use App\Http\Middleware\RedirectToHttps;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -61,6 +62,7 @@ Route::middleware([
     Route::delete('/dashboard/users/{id}', [UserController::class, 'delete'])->name('user.delete');
     Route::post('/dashboard/users/giveAdmin/{id}', [UserController::class, 'giveAdmin'])->name('user.giveAdmin');
     Route::post('/dashboard/users/giveEditor/{id}', [UserController::class, 'giveEditor'])->name('user.giveEditor');
+    Route::post('/dashboard/users/giveCollaborator/{id}', [UserController::class, 'giveCollaborator'])->name('user.giveCollaborator');
     Route::post('/dashboard/users/deleteRoles/{id}', [UserController::class, 'deleteRoles'])->name('user.deleteRoles');
 
     Route::get('/dashboard/courses', [DashboardController::class, 'courses'])->name('dashboard.courses');

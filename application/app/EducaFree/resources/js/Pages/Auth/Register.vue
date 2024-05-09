@@ -6,6 +6,8 @@ import PrimaryButton from '@/Components/PrimaryButton.vue';
 import TextInput from '@/Components/TextInput.vue';
 import AuthLayout from '@/Layouts/AuthLayout.vue';
 import logo from '../../../../public/images/icon/logo.svg';
+import { fetchCheckEmailData } from './services/fetchCheckEmailData';
+import { ref } from 'vue';
 
 // Definicion del form
 const form = useForm({
@@ -16,12 +18,41 @@ const form = useForm({
     terms: false,
 });
 
+const status = ref('');
 // Funcion para enviar el formulario del register
 const submit = () => {
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'), // Resetea los valores de los inputs
     });
 };
+
+const handleSubmit = async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Comprueba primero si es un email 'correcto'
+    if (!emailPattern.test(form.email)) {
+        status.value = 'Please enter a valid email address';
+        form.reset('password', 'password_confirmation');
+        setTimeout(() => {
+            status.value = '';
+        }, 3000);
+        return;
+    }
+
+    if(await fetchCheckEmailData(form.email)){
+        submit();
+    }else{
+        status.value = 'Email address not found. Please check your entry';
+        form.reset('password', 'password_confirmation'),
+        setTimeout(() => {
+            status.value = ''
+        }, 3000);
+    }
+}
+
 </script>
 
 <template>
@@ -31,6 +62,11 @@ const submit = () => {
         <div class="flex items-center justify-center pt-1 pb-10">
           <img :src="logo" alt="Logo" class="h-8 mr-2">
           <span class="self-center text-blue-700 text-2xl font-semibold whitespace-nowrap dark:text-blue-500">EducaFree</span>
+        </div>
+        <div>
+            <div class="flex items-center justify-center text-red-600">
+                {{ status }}
+            </div>
         </div>
         <form @submit.prevent="submit">
             <div>
@@ -88,7 +124,7 @@ const submit = () => {
             </div>
             </div>
             
-            <div class="flex items-center justify-center mt-10">
+            <div @click="handleSubmit" class="flex items-center justify-center mt-10">
                 <PrimaryButton class="ms-4 w-52 bg-blue-700 flex items-center justify-center" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Register
                 </PrimaryButton>

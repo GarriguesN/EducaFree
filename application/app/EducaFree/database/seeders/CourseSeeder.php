@@ -16,7 +16,7 @@ class CourseSeeder extends Seeder
     {   
         $faker = Faker::create();
 
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 1000; $i++) {
             $name = $faker->sentence(5);
             $description = $faker->text(150);
             $imagePath = $this->generateImage($name);
@@ -25,6 +25,8 @@ class CourseSeeder extends Seeder
                 'name' =>  $faker->sentence(5),
                 'description' => $faker->text(150),
                 'img' => $imagePath,
+                'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
+                'updated_at' => now(),
                 'vision' => 1
             ]);
         }

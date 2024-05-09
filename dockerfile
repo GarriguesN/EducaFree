@@ -33,5 +33,6 @@ RUN a2enmod php8.3 && \
 WORKDIR /var/www/html
 # Exponer el puerto 80 para Apache
 EXPOSE 80
+EXPOSE 8000
 # Comando para ejecutar la aplicación cuando se inicie el contenedor
 CMD ["apache2ctl", "-D", "FOREGROUND"]

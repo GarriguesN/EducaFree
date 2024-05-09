@@ -39,6 +39,13 @@ class UserController extends Controller
         return Inertia::location(route('dashboard.users'));
     }
 
+    // Funcion para dar rol Collaborador
+    public function giveCollaborator($id){
+        $user = User::where('id', $id)->first();
+        $user->assignRole('collaborator');
+        return Inertia::location(route('dashboard.users'));
+    }
+
     // Funcion para eliminar rol Administrador y Editor
     public function deleteRoles($id){
         $user = User::where('id', $id)->first();
@@ -94,6 +101,7 @@ class UserController extends Controller
             $query->where('progress', 100); // Solo contar los cursos completados
         }])
         ->orderByDesc('courses_info_count')
+        ->take(10)
         ->get();
 
         // Devolver los datos del ranking como una respuesta JSON
@@ -167,6 +175,19 @@ class UserController extends Controller
                 'status' => $status,
                 'phpVersion' => PHP_VERSION
             ]);
+        }
+    }
+
+    public function checkEmail(Request $request) {
+        $email = $request->input('email');
+
+        $emailParts = explode('@', $email);
+        $domain = isset($emailParts[1]) ? $emailParts[1] : null;
+
+        if(checkdnsrr($domain, 'MX')){
+            return true;
+        }else{
+            return false;
         }
     }
 }

@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => 'd6ecb82aff65b6a1934bbf9921094c09fd518fef',
+        'pretty_version' => '1.0.0+no-version-set',
+        'version' => '1.0.0.0',
+        'reference' => NULL,
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -461,9 +461,9 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => 'd6ecb82aff65b6a1934bbf9921094c09fd518fef',
+            'pretty_version' => '1.0.0+no-version-set',
+            'version' => '1.0.0.0',
+            'reference' => NULL,
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -691,6 +691,24 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'openai-php/client' => array(
+            'pretty_version' => 'v0.8.5',
+            'version' => '0.8.5.0',
+            'reference' => '0f755fafa4d3f8d5c8ed964d3166d078fac0605a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../openai-php/client',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'openai-php/laravel' => array(
+            'pretty_version' => 'v0.8.1',
+            'version' => '0.8.1.0',
+            'reference' => 'cdcf65d19a9a847cfdf249e7b1b6897ea6e9b650',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../openai-php/laravel',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'paragonie/constant_time_encoding' => array(
             'pretty_version' => 'v2.6.3',
             'version' => '2.6.3.0',
@@ -733,6 +751,36 @@
             'reference' => '0e46722c154726a5f9ac218197ccc28adba16fcf',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phenx/php-svg-lib',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'php-http/async-client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '*',
+            ),
+        ),
+        'php-http/client-implementation' => array(
+            'dev_requirement' => false,
+            'provided' => array(
+                0 => '*',
+            ),
+        ),
+        'php-http/discovery' => array(
+            'pretty_version' => '1.19.4',
+            'version' => '1.19.4.0',
+            'reference' => '0700efda8d7526335132360167315fdab3aeb599',
+            'type' => 'composer-plugin',
+            'install_path' => __DIR__ . '/../php-http/discovery',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
+        'php-http/multipart-stream-builder' => array(
+            'pretty_version' => '1.3.0',
+            'version' => '1.3.0.0',
+            'reference' => 'f5938fd135d9fa442cc297dc98481805acfe2b6a',
+            'type' => 'library',
+            'install_path' => __DIR__ . '/../php-http/multipart-stream-builder',
             'aliases' => array(),
             'dev_requirement' => false,
         ),
@@ -866,6 +914,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '*',
             ),
         ),
         'psr/http-factory' => array(
@@ -881,6 +930,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '*',
             ),
         ),
         'psr/http-message' => array(
@@ -896,6 +946,7 @@
             'dev_requirement' => false,
             'provided' => array(
                 0 => '1.0',
+                1 => '*',
             ),
         ),
         'psr/log' => array(

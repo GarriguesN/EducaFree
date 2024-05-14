@@ -120,8 +120,7 @@
 </script>
 
 <template>
-    <div id="marketing-banner" tabindex="-1"
-        class="fixed z-50 top-36 flex flex-col md:flex-row-reverse justify-between w-[calc(100%-2rem)] p-4 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-sm lg:max-w-7xl left-1/2 dark:bg-gray-700 dark:border-blue-600">
+    <div class="fixed z-50 top-36 flex flex-col md:flex-row-reverse justify-between w-[calc(100%-2rem)] p-4 -translate-x-1/2 bg-white border border-gray-200 rounded-lg shadow-sm lg:max-w-7xl left-1/2 dark:bg-gray-700 dark:border-blue-600">
         <div class="items-center justify-end flex flex-shrink-0 flex-end">
             <button data-dismiss-target="#marketing-banner" @click="$emit('close')" type="button"
                 class="flex-shrink-0 inline-flex justify-center w-7 h-7 items-center text-gray-400 hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 dark:hover:bg-gray-600 dark:hover:text-white">

@@ -502,71 +502,64 @@ class DashboardController extends Controller
         ]);
     }
 
+    // Funcion para recoger los usuarios en un rango de tiempo
     public function countUsersByTimeRange(Request $request)
     {
         $timeRange = $request->query('timeRange');
         $startDate = null;
         $endDate = null;
 
-        // Calculate the current time range based on the input parameter
+        // Calculamos el rango de tiempo
         switch ($timeRange) {
             case 'today':
-                // Set start and end dates for today
                 $startDate = Carbon::today();
                 $endDate = Carbon::tomorrow();
-
                 break;
             case 'all':
-                // Set start and end dates for yesterday
-                $startDate = Carbon::minValue(); // Start from the earliest possible date
+                $startDate = Carbon::minValue();
                 $endDate = Carbon::maxValue();
                 break;
             case 'last7days':
-                // Set start and end dates for the last 7 days
                 $startDate = Carbon::today()->subDays(7);
                 $endDate = Carbon::today();
                 break;
             case 'last30days':
-                // Set start and end dates for the last 30 days
                 $startDate = Carbon::today()->subDays(30);
                 $endDate = Carbon::today();
                 break;
             case 'last90days':
-                // Set start and end dates for the last 90 days
                 $startDate = Carbon::today()->subDays(90);
                 $endDate = Carbon::today();
                 break;
             default:
-                // Invalid time range
                 return response()->json(['error' => 'Invalid time range'], 400);
         }
 
-        // Count users within the current time range
+        // Contamos los usuarios en esos rangos
         $usersCountInRange = User::whereBetween('created_at', [$startDate->toDateString(), $endDate->toDateString()])->count();
 
-        // Calculate the length of the current range in days
+        // Calculamos la diferencia de dias
         $currentRangeLengthInDays = $startDate->diffInDays($endDate);
 
-        // Calculate the preceding time range
+        // Calculamos el tiempo anterior 
         $precedingStartDate = $startDate->copy()->subDays($currentRangeLengthInDays);
         $precedingEndDate = $startDate->copy();
 
-        // Count users within the preceding time range
+        // Contramos los usuarios del rango anterior
         $usersCountInPrecedingRange = User::whereBetween('created_at', [$precedingStartDate->toDateString(), $precedingEndDate->toDateString()])->count();
 
-        // Calculate the change in user count
+        // Calculamos la diferencia de usuarios en esos dos rangos de tiempo
         $change = $usersCountInRange - $usersCountInPrecedingRange;
 
-        // Calculate the rounded percentage change
+        // Calculamos el porcentaje
         $percentageChange = 0;
         if ($usersCountInPrecedingRange > 0) {
             $percentageChange = round(($change / $usersCountInPrecedingRange) * 100);
         } elseif ($change > 0 && $usersCountInPrecedingRange == 0) {
-            // Handle the case when there was no user count in the preceding range
             $percentageChange = 100;
         }
 
-        // Return the calculated results as a JSON response
+        // Devolvemos en JSON los datos
         return response()->json([
             'usersCountInRange' => $usersCountInRange,
             'change' => $change,
@@ -574,71 +567,56 @@ class DashboardController extends Controller
         ]);
     }
 
+     // Funcion para recoger los cursos en un rango de tiempo
     public function countCoursesByTimeRange(Request $request)
     {
-        // Retrieve the time range from the request query parameters
         $timeRange = $request->query('timeRange');
         $startDate = null;
         $endDate = null;
 
-        // Calculate the current time range based on the input parameter
         switch ($timeRange) {
             case 'today':
-                // Set start and end dates for today
                 $startDate = Carbon::today();
                 $endDate = Carbon::tomorrow();
                 break;
             case 'all':
-                // Set start and end dates for all time
-                $startDate = Carbon::minValue(); // Start from the earliest possible date
-                $endDate = Carbon::maxValue(); // End at the latest possible date
+                $startDate = Carbon::minValue();
+                $endDate = Carbon::maxValue();
                 break;
             case 'last7days':
-                // Set start and end dates for the last 7 days
                 $startDate = Carbon::today()->subDays(7);
                 $endDate = Carbon::today();
                 break;
             case 'last30days':
-                // Set start and end dates for the last 30 days
                 $startDate = Carbon::today()->subDays(30);
                 $endDate = Carbon::today();
                 break;
             case 'last90days':
-                // Set start and end dates for the last 90 days
                 $startDate = Carbon::today()->subDays(90);
                 $endDate = Carbon::today();
                 break;
             default:
-                // Invalid time range
                 return response()->json(['error' => 'Invalid time range'], 400);
         }
 
-        // Count courses within the current time range
         $coursesCountInRange = Course::whereBetween('created_at', [$startDate->toDateString(), $endDate->toDateString()])->count();
 
-        // Calculate the length of the current range in days
         $currentRangeLengthInDays = $startDate->diffInDays($endDate);
 
-        // Calculate the preceding time range
         $precedingStartDate = $startDate->copy()->subDays($currentRangeLengthInDays);
         $precedingEndDate = $startDate->copy();
 
-        // Count courses within the preceding time range
         $coursesCountInPrecedingRange = Course::whereBetween('created_at', [$precedingStartDate->toDateString(), $precedingEndDate->toDateString()])->count();
 
-        // Calculate the change in course count
         $change = $coursesCountInRange - $coursesCountInPrecedingRange;
 
-        // Calculate the rounded percentage change
         $percentageChange = 0;
         if ($coursesCountInPrecedingRange > 0) {
             $percentageChange = round(($change / $coursesCountInPrecedingRange) * 100);
         } elseif ($change > 0 && $coursesCountInPrecedingRange == 0) {
-            // Handle the case when there was no course count in the preceding range
             $percentageChange = 100;
         }
 
-        // Return the calculated results as a JSON response
         return response()->json([
             'coursesCountInRange' => $coursesCountInRange,
             'change' => $change,
@@ -646,40 +624,36 @@ class DashboardController extends Controller
         ]);
     }
 
+     // Funcion para recoger las requests por si estan completos o no
     public function countRequestsByTimeRange(Request $request)
     {
-        // Determine the status filter from the request
-        $statusFilter = $request->query('timeRange'); // Default to 'all' if not specified
+
+        $statusFilter = $request->query('timeRange');
 
         $completedRequestsCount = 0;
         $notCompletedRequestsCount = 0;
 
-        // Fetch request count based on the status filter
+
+        // Filtramos por completos, no completo o los dos
         if ($statusFilter === 'completed') {
             $completedRequestsCount = ModelsRequest::where('completed', '1')->count();
-            // Also get the count of not completed requests
             $notCompletedRequestsCount = ModelsRequest::where('completed', '0')->count();
         } elseif ($statusFilter === 'notCompleted') {
             $notCompletedRequestsCount = ModelsRequest::where('completed', '0')->count();
-            // Also get the count of completed requests
             $completedRequestsCount = ModelsRequest::where('completed', '1')->count();
         } else {
-            // If 'all' status, count all requests
             $completedRequestsCount = ModelsRequest::where('completed', '1')->count();
             $notCompletedRequestsCount = ModelsRequest::where('completed', '0')->count();
         }
 
-        // Calculate the difference between completed and not completed requests
         $difference = 0;
         $difference = $completedRequestsCount - $notCompletedRequestsCount;
 
-        // Calculate the percentage change and handle division by zero
         $percentageChange = 0;
         if ($notCompletedRequestsCount > 0) {
             $percentageChange = round(($difference / $notCompletedRequestsCount) * 100);
         }
 
-        // Return the data as JSON
         return response()->json([
             'completedRequestsCount' => $completedRequestsCount,
             'notCompletedRequestsCount' => $notCompletedRequestsCount,
@@ -688,12 +662,13 @@ class DashboardController extends Controller
         ]);
     }
 
+    // Funcion para recoger los cursos con mas Likes
     public function countMostLikedByTimeRange(Request $request)
     {
-        // Retrieve the filter from the request, default to 'all' if not provided.
+
         $filter = $request->input('timeRange', 'all');
     
-        // Define the number of courses to limit the query results to.
+        // Se define los cursos con mas likes queremos mostrar
         $limit = 0;
         switch ($filter) {
             case 'sixLiked':
@@ -706,27 +681,21 @@ class DashboardController extends Controller
                 $limit = 1;
                 break;
             default:
-                // If 'all' is specified, no limit is applied.
                 break;
         }
     
-        // Query the most liked courses ordered by the count of likes (favorites).
         $mostLikedCoursesQuery = Favorite::select('course_id', DB::raw('COUNT(*) as like_count'))
             ->groupBy('course_id')
             ->orderBy('like_count', 'desc');
     
-        // Apply the limit if necessary.
         if ($limit > 0) {
             $mostLikedCoursesQuery->take($limit);
         }
-    
-        // Execute the query and retrieve the most liked courses.
+
         $mostLikedCourses = $mostLikedCoursesQuery->get();
     
-        // Calculate the total number of users in the platform.
         $totalUsers = User::count();
-    
-        // Get course details by joining with the Course model.
+
         $coursesWithDetails = $mostLikedCourses->map(function ($favorite) {
             $course = Course::find($favorite->course_id);
             return [
@@ -736,18 +705,15 @@ class DashboardController extends Controller
             ];
         });
     
-        // Calculate the percentage of likes for each most liked course based on the total users.
         $coursesWithPercentage = $coursesWithDetails->map(function ($courseDetail) use ($totalUsers) {
             return [
                 'course_id' => $courseDetail['course_id'],
                 'course_name' => $courseDetail['course_name'],
                 'like_count' => $courseDetail['like_count'],
-                // Calculate percentage of total users who liked the course
                 'percentage_of_total_users' => $totalUsers > 0 ? ($courseDetail['like_count'] / $totalUsers) * 100 : 0,
             ];
         });
     
-        // Return the data as JSON, including the courses and their percentage of total users who liked them.
         return response()->json([
             'courses' => $coursesWithPercentage,
             'totalLikes' => Favorite::count(),
@@ -756,55 +722,45 @@ class DashboardController extends Controller
         ]);
     }
 
+         // Funcion para recoger los cursos completos por los usuarios en un rango de tiempo
     public function countCompletedByTimeRange(Request $request)
     {
-        // Retrieve the 'timeRange' parameter from the request, defaulting to 'all' if not provided
         $timeRange = $request->input('timeRange', 'all');
-    
-        // Determine the date range based on the specified time range
+
         $startDate = null;
-        $endDate = now(); // Default end date is the current date and time
+        $endDate = now(); 
     
         switch ($timeRange) {
             case 'today':
-                // Set start and end dates for today
                 $startDate = Carbon::today();
                 break;
             case 'all':
-                // Set start and end dates for all time
-                $startDate = Carbon::minValue(); // Start from the earliest possible date
+                $startDate = Carbon::minValue();
                 break;
             case 'last7days':
-                // Set start and end dates for the last 7 days
                 $startDate = Carbon::today()->subDays(7);
                 break;
             case 'last30days':
-                // Set start and end dates for the last 30 days
                 $startDate = Carbon::today()->subDays(30);
                 break;
             case 'last90days':
-                // Set start and end dates for the last 90 days
                 $startDate = Carbon::today()->subDays(90);
                 break;
             default:
-                // Invalid time range
                 return response()->json(['error' => 'Invalid time range'], 400);
         }
     
-        // Query the CourseInfo model to get completion data
         $courseInfoQuery = CourseInfo::select('course_id', DB::raw('COUNT(CASE WHEN progress = 100 THEN 1 ELSE NULL END) AS completed_count'),
                                               DB::raw('COUNT(*) AS total_enrolled'))
-            ->groupBy('course_id');
+                                                ->groupBy('course_id');
     
-        // Apply the date range filter if specified
+
         if ($startDate) {
             $courseInfoQuery->whereBetween('created_at', [$startDate, $endDate]);
         }
     
-        // Execute the query to get course completion data
         $courseCompletionData = $courseInfoQuery->get();
     
-        // Calculate the completion rates for each course
         $completionRatesPerCourse = $courseCompletionData->map(function ($data) {
             return [
                 'course_id' => $data->course_id,
@@ -814,7 +770,6 @@ class DashboardController extends Controller
             ];
         });
     
-        // Calculate the overall completion rate across all courses
         $overallCompletedCount = CourseInfo::where('progress', 100)
             ->when($startDate, function ($query) use ($startDate, $endDate) {
                 return $query->whereBetween('created_at', [$startDate, $endDate]);
@@ -830,54 +785,45 @@ class DashboardController extends Controller
     
         $overallCompletionRate = $overallTotalEnrolled > 0 ? round(($overallCompletedCount / $overallTotalEnrolled) * 100, 2) : 0;
     
-        // Return the data as JSON
         return response()->json([
             'completionRatesPerCourse' => $completionRatesPerCourse,
             'overallCompletionRate' => $overallCompletionRate,
         ]);
     }
 
+         // Funcion para recoger los 'consumidores' de nuestra LTI en un rango de tiempo
     public function countLtiConsumerByTimeRange(Request $request){
         $timeRange = $request->query('timeRange');
         $startDate = null;
         $endDate = null;
 
-        // Calculate the current time range based on the input parameter
         switch ($timeRange) {
             case 'today':
-                // Set start and end dates for today
                 $startDate = Carbon::today();
                 $endDate = Carbon::tomorrow();
                 break;
             case 'all':
-                // Set start and end dates for all time
-                $startDate = Carbon::minValue(); // Start from the earliest possible date
-                $endDate = Carbon::maxValue(); // End at the latest possible date
+                $startDate = Carbon::minValue();
+                $endDate = Carbon::maxValue();
                 break;
             case 'last7days':
-                // Set start and end dates for the last 7 days
                 $startDate = Carbon::today()->subDays(7);
                 $endDate = Carbon::today();
                 break;
             case 'last30days':
-                // Set start and end dates for the last 30 days
                 $startDate = Carbon::today()->subDays(30);
                 $endDate = Carbon::today();
                 break;
             case 'last90days':
-                // Set start and end dates for the last 90 days
                 $startDate = Carbon::today()->subDays(90);
                 $endDate = Carbon::today();
                 break;
             default:
-                // Invalid time range
                 return response()->json(['error' => 'Invalid time range'], 400);
         }
 
-        // Calculate the count of LTI consumers in the specified time range
         $countLtiConsumers =  LtiConsumer::whereBetween('created', [$startDate->toDateString(), $endDate->toDateString()])->count();
 
-        // Calculate change and percentage change
         $currentRangeLengthInDays = $startDate->diffInDays($endDate);
         $precedingStartDate = $startDate->copy()->subDays($currentRangeLengthInDays);
         $precedingEndDate = $startDate->copy();
@@ -890,11 +836,9 @@ class DashboardController extends Controller
         if ($countLtiConsumerstInPrecedingRange > 0) {
             $percentageChange = round(($change / $countLtiConsumerstInPrecedingRange) * 100);
         } elseif ($change > 0 && $countLtiConsumerstInPrecedingRange == 0) {
-            // Handle the case when there was no user count in the preceding range
             $percentageChange = 100;
         }
 
-        // Return the results as JSON
         return response()->json([
             'count' => $countLtiConsumers,
             'change' => $change,

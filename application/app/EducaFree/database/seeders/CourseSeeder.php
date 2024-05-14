@@ -18,7 +18,6 @@ class CourseSeeder extends Seeder
 
         for ($i = 0; $i < 1000; $i++) {
             $name = $faker->sentence(5);
-            $description = $faker->text(150);
             $imagePath = $this->generateImage($name);
 
             Course::factory()->create([

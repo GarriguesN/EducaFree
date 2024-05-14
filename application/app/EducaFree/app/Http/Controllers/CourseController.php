@@ -16,6 +16,7 @@ use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
 
+use function PHPUnit\Framework\isNull;
 
 class CourseController extends Controller
 {
@@ -96,8 +97,8 @@ class CourseController extends Controller
         // Si se sube una imagen, se guarda en la carpeta de imagenes y se guarda la ruta en la base de datos
         if(isset($img)) {
             $imgName = str_replace(' ', '', $request->input('name'));
-            $img->storeAs('public/ImagesCourses', $imgName. 'png');
-            $course->img = $imgName.'png';
+            $img->storeAs('public/ImagesCourses', $imgName. '.png');
+            $course->img = $imgName.'.png';
         }
 
         $course->save();
@@ -115,8 +116,12 @@ class CourseController extends Controller
         // Si se sube una imagen, se guarda en la carpeta de imagenes y se guarda la ruta en la base de datos
         if(isset($img)) {
             $imgName = str_replace(' ', '', $request->input('name'));
-            $img->storeAs('public/ImagesCourses', $imgName. 'png');
-            $course->img = $imgName.'png';
+            $img->storeAs('public/ImagesCourses', $imgName. '.png');
+            $course->img = $imgName.'.png';
+        }else{
+            if(isNull($img) && $request->input('edited') == true){
+                $course->img = null;
+            }
         }
         $course->save();
 
@@ -219,27 +224,24 @@ class CourseController extends Controller
         return Inertia::location(route('dashboard.pendingCourses'));
     }
 
+    // Funcion para recoger los cursos creados pendientes de revision
     public function dataPendings(Request $request)
     {
-        // Obtain the user ID from the request
+
         $userId = $request->input('userId');
     
-        // Validate userId input
+
         if (!$userId) {
             return response()->json([
                 'error' => 'User ID is required.'
             ], 400);
         }
-    
-        // Query the database for pending courses uploaded by the user
+
         $pendingCourses = Course::where('uploader', $userId)
             ->where('revision_status', 'pending')
             ->first();
     
-        // Determine whether there are any pending courses
-        
-    
-        // Return a JSON response indicating whether there are pending courses
+
         return response()->json([
             'hasPendingCourses' => $pendingCourses,
         ]);

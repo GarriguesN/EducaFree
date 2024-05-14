@@ -16,19 +16,17 @@ return new class extends Migration
             $table->unsignedBigInteger('comment_id');
             $table->timestamp('liked_at')->useCurrent();
 
-            // Define a composite primary key
             $table->primary(['user_id', 'comment_id']);
 
-            // Define foreign keys
             $table->foreign('user_id')
                 ->references('id')
                 ->on('users')
-                ->onDelete('cascade'); // cascade delete to keep data integrity
+                ->onDelete('cascade');
 
             $table->foreign('comment_id')
                 ->references('id')
                 ->on('comments')
-                ->onDelete('cascade'); // cascade delete to keep data integrity
+                ->onDelete('cascade');
         });
     }
 

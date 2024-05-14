@@ -16,25 +16,21 @@ class CommentsSeeder extends Seeder
      */
     public function run(): void
     {
-            // Create an instance of the Faker library
             $faker = Faker::create();
 
-            // Retrieve all courses and users
             $courses = Course::all();
             $users = User::all();
 
-            // Iterate over each course
             foreach ($courses as $course) {
-                // For each course, create 10 comments
-                for ($i = 0; $i < 10; $i++) {
-                    // Randomly select a user from the users collection
+                $numComments = rand(1, 10);
+
+                for ($i = 0; $i < $numComments; $i++) {
                     $randomUser = $users->random();
 
-                    // Create a comment with the selected course and random user
                     Comment::factory()->create([
                         'course_id' => $course->id,
                         'user_id' => $randomUser->id,
-                        'comment' => $faker->paragraph(), // Generate a random description
+                        'comment' => $faker->paragraph(),
                     ]);
                 }
             }

@@ -22,8 +22,11 @@ class LessonSeeder extends Seeder
         
         // Iterar sobre cada lección
         foreach ($courses as $course) {
-            // Crear dos puntos por cada lección
-            for ($i = 0; $i < 5; $i++) {
+            // Generar un número aleatorio entre 3 y 10
+            $numLessons = rand(3, 10);
+            
+            // Crear lecciones aleatorias
+            for ($i = 0; $i < $numLessons; $i++) {
                 Lesson::factory()->create([
                     'course_id' => $course->id,
                     'name' => $faker->sentence(5),

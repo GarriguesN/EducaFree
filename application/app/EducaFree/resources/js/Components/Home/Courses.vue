@@ -103,26 +103,30 @@ const orderBy = (criteria) => {
     const courseInfoTrue = courseInfo.value.courseInfo;
     const courseFavoritesTrue = favorites.value.favorites;
     activeButton.value = criteria;
+
     if (Array.isArray(courseInfoTrue) && Array.isArray(courseFavoritesTrue)) {
         courses.value = courses.value.map(course => {
             const info = courseInfoTrue.find(info => info.course_id === course.id);
             const favorite = courseFavoritesTrue.find(favorite => favorite.course_id === course.id);
             
+
             return {
                 ...course,
                 progress: info ? info.progress : null,
                 favorite: favorite ? true : false
             };
+
+
         }).sort((a, b) => {
             switch (criteria) {
                 case 'default':
                     if (a.favorite && !b.favorite) return -1; // Ordenar por favoritos primero
                     if (!a.favorite && b.favorite) return 1;
 
-                case 'length':
-                    return b.name.length - a.name.length; // Ordenar por longitud, de mayor a menor
+                    case 'length':
+                    return b.lessons_count - a.lessons_count; // Ordenar por número de lecciones, de mayor a menor
                 case 'shortest':
-                    return a.name.length - b.name.length; // Ordenar por longitud, de menor a mayor
+                    return a.lessons_count - b.lessons_count; // Ordenar por número de lecciones, de menor a mayor
                 case 'alphabeticalA':
                     return a.name.localeCompare(b.name); // Ordenar alfabéticamente
                 case 'alphabeticalZ':

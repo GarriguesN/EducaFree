@@ -169,7 +169,7 @@
         modelValue: String,
     })
 
-    const limit = 500;
+    const limit = 1200;
     const showModalImg = ref(false);
     const message = ref('');
 
@@ -205,7 +205,6 @@
     }
     }))
 
-    console.log('fuera funcion: ');
     console.log(editor)
     
     const handleImageUpload = async (event) => {

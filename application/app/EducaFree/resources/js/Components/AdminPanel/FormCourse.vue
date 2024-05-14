@@ -18,11 +18,18 @@ const props = defineProps({
         required: false,
         default: false
     },
+    image: {
+        type: String,
+    }
 });
 
 // Declaración de una variable reactiva para controlar el modal
 let showModal = ref(false);
 let option = ref(true);
+let image = ref(props.image);
+const fileName = ref(image);
+const originalFileName = ref('');
+
 // Función para abrir el modal
 const openModal = (error) => {
     option.value = error;
@@ -32,15 +39,31 @@ const openModal = (error) => {
 // Definir un evento para emitir el formulario
 defineEmits(["submit"]);
 
+// Funcion para convertir una url a imagen
+function dataURLtoBlob(dataURL) {
+    const parts = dataURL.split(';base64,');
+    const contentType = parts[0].split(':')[1];
+    const raw = window.atob(parts[1]);
+    const rawLength = raw.length;
+    const uInt8Array = new Uint8Array(rawLength);
+
+    for (let i = 0; i < rawLength; ++i) {
+        uInt8Array[i] = raw.charCodeAt(i);
+    }
+
+    return new Blob([uInt8Array], { type: contentType });
+}
+
 // Función para manejar la carga de imágenes
 const handleImageUpload = (event) => {
-    console.log('works');
+
     option.value = true;
     const file = event.target.files[0]; // Accede al archivo seleccionado
     const allowedExtensions = ["png", "jpg", "jpeg"]; // Extensiones permitidas
 
     // Verifica si se seleccionó un archivo
     if (file) {
+        originalFileName.value = file.name;
         const extension = file.name.split('.').pop().toLowerCase(); // Obtiene la extensión del archivo
         // Verifica si la extensión es PNG o JPG
         if (!allowedExtensions.includes(extension)) {
@@ -51,15 +74,47 @@ const handleImageUpload = (event) => {
             const reader = new FileReader();
             // Cuando el archivo se cargue, lea el contenido y lo asigne a la propiedad img del formulario
             reader.onload = (e) => {
+
                 const img = new Image();
                 img.src = e.target.result;
 
                 img.onload = () => {
-                    const width = img.width;
-                    const height = img.height;
+                    image.value = originalFileName.value;
+                    fileName.value = image.value
+                    console.log(image.value)
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const maxWidth = 920;
+                    const maxHeight = 520;
+                    let width = img.width;
+                    let height = img.height;
 
-                    if (width >= 920 && height >= 520) {
-                        props.form.img = file;
+                    if (width >= maxWidth || height >= maxHeight) {
+                        const aspectRatio = width / height;
+                        if (width > height) {
+                            width = maxWidth;
+                            height = width / aspectRatio;
+                        } else {
+                            height = maxHeight;
+                            width = height * aspectRatio;
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+
+                        // Convierte el canvas en una imagen data URL
+                        const resizedDataURL = canvas.toDataURL('image/jpeg');
+                        console.log(resizedDataURL);
+
+
+                        const blob = dataURLtoBlob(resizedDataURL);
+
+                        const resizedFile = new File([blob], originalFileName, { type: 'image/png' });
+
+                        // Asigna la imagen redimensionada al formulario
+                        props.form.img = resizedFile;
+
                     }else{
                         openModal(false);
                         event.target.value = '';
@@ -67,12 +122,21 @@ const handleImageUpload = (event) => {
                 }
             };
             reader.readAsDataURL(file); // Lector de archivos
-            // Asigna el archivo seleccionado al formulario
-            
-            props.form.img = file; // Asigna el archivo seleccionado al formulario
         }
     }
 }
+
+const deleteImg = () => {
+    image.value = null;
+    props.form.img = null;
+    fileName.value = ""
+    props.form.edited = true;
+}
+
+const openFileInput = () => {
+    const fileInput = document.getElementById('fileInput');
+    fileInput.click();
+};
 </script>
 
 <template>
@@ -98,10 +162,23 @@ const handleImageUpload = (event) => {
                 <InputError :message="$page.props.errors.description" class="mt-2"/>
 
                 <InputLabel for="img" value="Image" class="mt-3"/>
-                <input type="file" id="img" @change="handleImageUpload" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm w-full"></input>
-                <InputError :message="$page.props.errors.img" class="mt-2"/>
+                <div class="flex">
+                    <button @click.prevent="openFileInput" class="border border-gray-300 bg-gray-100 hover:bg-blue-700 dark:bg-gray-400 dark:hover:bg-blue-700 dark:text-gray-800 hover:text-white dark:hover:text-white rounded-s-md p-2">Choose Image</button>
+                    <input type="text" :value="fileName" readonly class="border-gray-300 rounded-e-md dark:bg-zinc-600 shadow-sm w-[70%]">
+                    <input type="file" style="display: none" id="fileInput" ref="fileInput" @change="handleImageUpload">
+
+                    <button @click.prevent="deleteImg" class="flex items-center text-sm hover:text-red-600" v-if="image">
+                        <span class="ml-2 text-red-500 hover:text-red-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                            </svg>
+                        </span>
+                        Remove current
+                    </button>
+                </div>
             </div>
-            
         </template>
         
             <template #actions>
@@ -125,3 +202,7 @@ const handleImageUpload = (event) => {
 </Modal>
 
 </template>
+
+<style>
+
+</style>

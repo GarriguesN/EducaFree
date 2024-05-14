@@ -19,24 +19,29 @@ class LikeCommentsSeeder extends Seeder
     {
         $faker = Faker::create();
 
-            // Retrieve all courses and users
-            $comments = Comment::all();
-            $users = User::all();
+        $comments = Comment::all();
+        $users = User::all();
 
-            // Iterate over each course
-            foreach ($comments as $comment) {
-                // For each course, create 10 comments
-                for ($i = 0; $i < 10; $i++) {
-                    // Randomly select a user from the users collection
-                    $randomUser = $users->random();
+        foreach ($comments as $comment) {
+            $likes = rand(1, 10);
 
-                    // Create a comment with the selected course and random user
+            for ($i = 0; $i < $likes; $i++) {
+
+                $randomUser = $users->random();
+
+                // Verificar si ya existe un like para este comentario y usuario
+                $existingLike = CommentLike::where('comment_id', $comment->id)
+                                            ->where('user_id', $randomUser->id)
+                                            ->exists();
+
+                if (!$existingLike) {
                     CommentLike::factory()->create([
                         'comment_id' => $comment->id,
                         'user_id' => $randomUser->id,
-                        'liked_at' => $faker->dateTimeBetween('-1 year', 'now'), // Generate a random description
+                        'liked_at' => $faker->dateTimeBetween('-1 year', 'now'),
                     ]);
                 }
             }
+        }
     }
 }

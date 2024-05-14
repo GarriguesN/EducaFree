@@ -18,10 +18,9 @@ class LtiConsumerSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
-        
-        // Iterar sobre cada lección
+
         for ($i = 0; $i < 27; $i++) {
-            // Crear dos puntos por cada lección
+
                 LtiConsumer::factory()->create([
                     'name' => $faker->text(50), 
                     'platform_id' => $faker->url(), 

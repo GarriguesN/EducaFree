@@ -7,7 +7,6 @@ import FormPassword from "@/Components/Profile/updatePassword.vue";
 import FormDeleteAccount from  "@/Components/Profile/deleteAccount.vue"
 import {ref} from  "vue";
 import { fetchRankingData } from '../Profile/services/fetchRankigData';
-import n1 from '../../../../public/images/profile/rank/rank1.gif';
 
 // Definicion de props
 const props = defineProps({

@@ -263,8 +263,8 @@ const sendPrompt = async () => {
                         :class="{ hidden: activeTab !== index }" class="p-4 rounded-lg bg-gray-50 dark:bg-zinc-600 max-w-full"
                         :id="'lesson-content-' + index" role="tabpanel" :aria-labelledby="'lesson-tab-' + index">
                         <div v-for="(point, pointIndex) in lesson.points" :key="pointIndex" class="max-w-full mb-4">
-                            <h3 class="text-lg font-medium text-gray-800 dark:text-white">{{ point.name }}</h3>
-                            <p class="text-justify text-gray-600 dark:text-gray-200" v-html="point.explanation"></p>
+                            <h3 class="text-lg font-medium text-gray-800 dark:text-white border-b dark:border-gray-500 mb-2 w-full">{{ point.name }}</h3>
+                            <div class="explanation text-justify text-gray-600 dark:text-gray-200" v-html="point.explanation"></div>
                         </div>
                         <div v-if="lesson.pdf_url != null || lesson.content_url != null"
                             class="border-t border-gray-200 flex flex-col">
@@ -344,7 +344,7 @@ const sendPrompt = async () => {
 
     <!-- COMENTARIOS -->
     <div v-if="cmid == null">
-        <section v-if="$page.props.auth.user.email_verified_at != null" class="bg-white border-t-2 flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700 dark:border-gray-600">
+        <section v-if="$page.props.auth?.user?.email_verified_at != null" class="bg-white border-t-2 flex justify-end content-center flex-col shadow-lg dark:bg-zinc-700 dark:border-gray-600">
         <div class="border-b dark:border-gray-600">
             <Form :form="form" @submit="addComment"></Form>
         </div>
@@ -546,4 +546,53 @@ export default {
 #chatButton:hover #closeSpan p {
     color: rgb(63, 131, 248); 
 }
+
+.explanation h1, .explanation h2, .explanation h3, .explanation h4, .explanationh5, .explanation h6 {
+    font-size: revert;
+}
+
+.explanation blockquote, .explanation dl, .explanation dd, .explanation h1, .explanation h2, .explanation h3, .explanation h4, .explanation h5, .explanation h6, .explanation hr, .explanation figure, .explanation p, .explanation pre{
+    margin: revert;
+    padding: revert;
+    margin-top: 1px;
+}
+
+.explanation code{
+    background-color: black;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85em;
+    border-radius: 0.25rem;
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 400;
+}
+
+.explanation blockquote{
+    border-left: 0.25rem solid #dfe2e5;
+    padding: 0 1.25rem;
+    border-radius: 0.25rem;
+    font-style: italic;
+}
+
+.explanation ol, .explanation ul, .explanation menu {
+    margin: revert;
+    padding: revert;
+    list-style: revert;
+}
+
+.explanation ol li, .explanation ul li, .explanation menu li {
+    margin: revert;
+    padding: revert;
+}
+
+.explanation ol li:before, .explanation ul li:before, .explanation menu li:before {
+    content: revert;
+}
+
+.explanation img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 </style>

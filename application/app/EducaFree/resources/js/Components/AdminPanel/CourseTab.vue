@@ -35,6 +35,7 @@ let showModalPoint = ref(false);
 let showModalCourse = ref(false);
 let showModalPDF = ref(false);
 let categorie = ref('');
+let imagen = ref('');
 
 
 // Funciones para mostrar modal de eliminacion
@@ -62,7 +63,8 @@ const formCourse = useForm({
     name : '',
     description: '',
     id: '',
-    img: null
+    img: null,
+    edited: false
 })
 
 const formDataPDF = useForm({
@@ -144,13 +146,16 @@ const deletePDF = () => {
 }
 
 // Funciones para abrir modales de edición
-const openEditCourse = (name, description, id) => {
+const openEditCourse = (name, description, id, img) => {
     console.log(description);
     console.log(name);
     console.log(id);
     formCourse.name = name;
     formCourse.description = description;
     formCourse.id = id
+    console.log(img)
+    imagen.value = img;
+    console.log(imagen.value)
     showModalCourse.value = true;
 };
 
@@ -201,12 +206,15 @@ const editCourse = () => {
         _method: 'put', // Especificamos el método PUT aquí ya que no laravel no lo soporta
         name: formCourse.name,
         description: formCourse.description,
-        img: formCourse.img
+        img: formCourse.img,
+        edited: formCourse.edited,
     };
     router.post(route('course.editCourse', { id: courseId}), lessonData);
     showModalCourse.value = false;
 }
 
+const autoURL = window.location.origin;
+const urlBase = `${autoURL}/storage/ImagesCourses/`;
 </script>
 
 <template>
@@ -227,10 +235,15 @@ const editCourse = () => {
     <section class="relative">
         <div class="grid">
             <div class="col-span-1 flex flex-col items-center justify-center row">
+                <div class="flex flex-col justify-center items-center" v-if="course.img">
+                    <img class="w-[10rem]" :src="urlBase+course.img">
+                    <p class="text-center mt-2 text-sm text-gray-400">Image preview</p>
+                </div>
+                <div class="text-center mt-2 text-sm text-gray-400" v-else>No image loaded</div>
                 <h2 class="text-3xl text-center text-black mt-8 font-bold dark:text-white">{{ course.name }}</h2>
                 <h4 class="text-xl text-center text-black mt-8 font-bold dark:text-white">{{ course.description }}</h4>
             </div>
-            <p @click="openEditCourse(course.name, course.description, course.id)" class="m-3 text-blue-600 hover:text-blue-800 cursor-pointer flex justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> Edit</p>
+            <p @click="openEditCourse(course.name, course.description, course.id, course.img)" class="m-3 text-blue-600 hover:text-blue-800 cursor-pointer flex justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" class="mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg> Edit</p>
         </div>
     </section>
 
@@ -287,7 +300,7 @@ const editCourse = () => {
                 <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
                 </svg>
             </a>
-            <FormCourse :form="formCourse" @submit="editCourse" :updating="true"></FormCourse>
+            <FormCourse :form="formCourse" @submit="editCourse" :updating="true" :image="imagen"></FormCourse>
         </Modal>
 
         <Modal :show="showModalPDF" @close="showModalPDF = false">
@@ -305,8 +318,8 @@ const editCourse = () => {
                :id="'lesson-content-' + index" role="tabpanel"
                :aria-labelledby="'lesson-tab-' + index">
                 <div v-for="(point, pointIndex) in lesson.points" :key="pointIndex" class="max-w-full mb-4">
-                    <h3 class="text-lg font-medium text-gray-800 dark:text-white">{{ point.name }}</h3>
-                    <p class="text-justify text-gray-600 dark:text-gray-200" v-html="point.explanation"></p>
+                    <h3 class="text-lg font-medium text-gray-800 dark:text-white border-b dark:border-gray-400 mb-2">{{ point.name }}</h3>
+                    <div class="explanation text-justify text-gray-600 dark:text-gray-200" v-html="point.explanation"></div>
                     <div class="flex">
                         <p @click="openEditPoint(point.name, point.explanation, point.id)" class="text-blue-600 hover:text-blue-800 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg></p>
                         <p @click="openDelete(point.id, 'point')" class="text-red-600 hover:text-red-800 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></p>
@@ -357,3 +370,53 @@ export default {
     }
 };
 </script>
+
+<style>
+.explanation h1, .explanation h2, .explanation h3, .explanation h4, .explanationh5, .explanation h6 {
+    font-size: revert;
+}
+
+.explanation blockquote, .explanation dl, .explanation dd, .explanation h1, .explanation h2, .explanation h3, .explanation h4, .explanation h5, .explanation h6, .explanation hr, .explanation figure, .explanation p, .explanation pre{
+    margin: revert;
+    padding: revert;
+    margin-top: 1px;
+}
+
+.explanation code{
+    background-color: black;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.85em;
+    border-radius: 0.25rem;
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 400;
+}
+
+.explanation blockquote{
+    border-left: 0.25rem solid #dfe2e5;
+    padding: 0 1.25rem;
+    border-radius: 0.25rem;
+    font-style: italic;
+}
+
+.explanation ol, .explanation ul, .explanation menu {
+    margin: revert;
+    padding: revert;
+    list-style: revert;
+}
+
+.explanation ol li, .explanation ul li, .explanation menu li {
+    margin: revert;
+    padding: revert;
+}
+
+.explanation ol li:before, .explanation ul li:before, .explanation menu li:before {
+    content: revert;
+}
+
+.explanation img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+</style>

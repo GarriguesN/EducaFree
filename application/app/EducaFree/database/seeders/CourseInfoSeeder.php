@@ -19,14 +19,13 @@ class CourseInfoSeeder extends Seeder
     {
         $faker = Faker::create();
 
-            // Retrieve all courses and users
             $users = User::all();
             $courses = Course::all();
 
-            // Iterate over each course
-                // For each course, create 10 comments
                 foreach($courses as $course){
-                    for ($i = 0; $i < 300; $i++) {
+                    $numInfo = rand(1, 5);
+
+                    for ($i = 0; $i < $numInfo; $i++) {
 
                         $randomUser = $users->random();
 

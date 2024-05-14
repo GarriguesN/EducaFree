@@ -18,17 +18,9 @@ class RequestsSeeder extends Seeder
     public function run(): void
     {
         $faker = Faker::create();
-
-            // Retrieve all courses and users
             $users = User::all();
-
-            // Iterate over each course
-                // For each course, create 10 comments
                 for ($i = 0; $i < 240; $i++) {
-                    // Randomly select a user from the users collection
                     $randomUser = $users->random();
-
-                    // Create a comment with the selected course and random user
                     Request::factory()->create([
                         'title' => $faker->text(50),
                         'description' => $faker->paragraph(),

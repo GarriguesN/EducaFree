@@ -5,7 +5,7 @@ import ToggleDark from  '../Components/ToggleDark.vue';
 import { fetchRequestData } from '@/Pages/AdminPanel/services/fetchRequestsData';
 
 // Definicion de props
-defineProps({
+const props = defineProps({
     cmid: {
         type: Number,
         default: null
@@ -20,6 +20,7 @@ onMounted(async () => {
         console.error('Error fetching request data:', error);
     }
     });
+
 </script>
 
 <script>
@@ -34,12 +35,14 @@ export default  {
     },
 }
 
+
+
 </script>
 
 <template>
 <main>
     <header>
-        <Navbar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" :requests="requests" />
+        <Navbar :canLogin="$page.props.canLogin" :canRegister="$page.props.canRegister" :requests="requests" :cmid="cmid" />
     </header>
 
     

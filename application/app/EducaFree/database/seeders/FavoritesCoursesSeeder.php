@@ -17,16 +17,10 @@ class FavoritesCoursesSeeder extends Seeder
      */
     public function run(): void
     {
-        $faker = Faker::create();
-
-            // Retrieve all courses and users
             $users = User::all();
             $courses = Course::all();
 
-            // Iterate over each course
-                // For each course, create 10 comments
-
-                    for ($i = 0; $i < 5000; $i++) {
+                    for ($i = 0; $i < 3412; $i++) {
 
                         $randomUser = $users->random();
                         $randomCourse = $courses->random();

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\UpdateInfoRequest;
 use App\Http\Requests\UpdatePasswordRequest;
+use App\Models\CourseInfo;
+use App\Models\Favorite;
 use Exception;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Facades\Password;
@@ -19,6 +21,35 @@ use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
+    public function show(Request $request){
+        $user = $request->user();
+        $courseInfo = CourseInfo::where('user_id', $user->id)
+        ->with(['course' => function ($query) {
+            $query->withCount('lessons'); // Obtener el recuento de lecciones por curso
+        }])->get();
+
+        $favorites = Favorite::where('user_id', $user->id)->get();
+
+        $userId = $user->id;
+        $rankingData = User::selectRaw('(SELECT COUNT(*) FROM `course_info` WHERE `users`.`id` = `course_info`.`user_id` AND `progress` = 100) AS completed_courses_count, `users`.`id`')
+            ->orderByDesc('completed_courses_count')
+            ->get();
+        
+    $userIndex = $rankingData->search(function ($user) use ($userId) {
+        return $user->id === $userId;
+    });
+    
+    // Sumar 1 al índice para obtener la posición real (ya que los índices comienzan desde 0)
+    $userRank = $userIndex !== false ? $userIndex + 1 : null;
+
+        return Inertia::render('Profile/Profile', [
+            'canLogin' => Route::has('login'),
+            'canRegister' => Route::has('register'),
+            'coursesInfo' => $courseInfo,
+            'userRank' => $userRank,
+            'favorites' => $favorites
+        ]);
+    }
     // Funcion para eliminar el usuario
     public function delete($id){
         User::where('id', $id)->delete();

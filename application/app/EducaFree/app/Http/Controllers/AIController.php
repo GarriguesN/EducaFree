@@ -9,36 +9,35 @@ use OpenAI\Laravel\Facades\OpenAI;
 
 class AIController extends Controller
 {
-    
+    // Funcion para la respuesta de la Inteligencia Artificial
     public function request(Request $request)
     {
-        // Extract the prompt from the request
+        // Recojemos el mensaje 'prompt' que nos manda el usuario
         $prompt = $request->input('prompt');
         
         try {
-            // Call OpenAI's API using the OpenAI facade
+            // Llamamos a la IA
             $response = OpenAI::completions()->create([
                 'model' => 'gpt-3.5-turbo',
                 'prompt' => $prompt,
-                'max_tokens' => 150, // Adjust as needed
+                'max_tokens' => 150,
             ]);
 
-            // Extract the AI's response from the API response
+            // Recogemos la respuesta que nos da
             $aiResponse = $response->choices[0]->text;
 
-            // Return the AI's response as JSON
+            // La devolvemos en formato JSON
             return response()->json(['response' => $aiResponse, 'type' => 'ok', 'AI' => 'true']);
         } catch (\OpenAI\Exceptions\ErrorException $e) {
-            // Handle exceptions related to OpenAI's API
+
             if ($e->getMessage() === 'You exceeded your current quota, please check your plan and billing details. For more information on this error, read the docs: https://platform.openai.com/docs/guides/error-codes/api-errors.') {
-                // Handle the quota exceeded exception
+                // Si esta la cuota completa nos da error
                 return response()->json(['response' => 'The current Quota is exceeded.', 'type' => 'error', 'AI' => 'true'], 200);
             } else {
-                // Return a generic error message for other OpenAI-related exceptions
+
                 return response()->json(['response' => 'An OpenAI API error occurred: ' . $e->getMessage() , 'type' => 'error', 'AI' => 'true'], 200);
             }
         } catch (\Exception $e) {
-            // Handle other exceptions (non-OpenAI related)
             return response()->json(['error' => 'An error occurred while processing the request: ' . $e->getMessage()], 500);
         }
     }

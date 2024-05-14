@@ -31,21 +31,20 @@ class UsersSeeder extends Seeder
         ]);
         $editor->assignRole('editor');
 
-        // Create an instance of Faker
-        // $faker = FakerFactory::create();
+        $faker = FakerFactory::create();
 
-        // // Generate random users
-        // $numberOfUsers = 12000; // You can adjust this number as needed
+        // Cuantos usuarios se generan random
+        $numberOfUsers = 6000;
 
-        // for ($i = 0; $i < $numberOfUsers; $i++) {
-        //     User::create([
-        //         'name' => $faker->name,
-        //         'email' => $faker->unique()->safeEmail,
-        //         'password' => Hash::make($faker->password),
-        //         'created_at' => $faker->dateTimeBetween('-1 year', 'now'), // Random date in the past year
-        //         'updated_at' => now(),
-        //     ]);
-        // }
+        for ($i = 0; $i < $numberOfUsers; $i++) {
+            User::create([
+                'name' => $faker->name,
+                'email' => $faker->unique()->safeEmail,
+                'password' => Hash::make($faker->password),
+                'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
+                'updated_at' => now(),
+            ]);
+        }
 
 
     }

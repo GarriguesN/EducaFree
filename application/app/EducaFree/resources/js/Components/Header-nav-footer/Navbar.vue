@@ -107,7 +107,8 @@
       </div>
     </nav>
 
-    <div v-if="requests">
+
+    <div v-if="requests && cmid == null">
       <Banner v-if="showIt" class="!fixed !top-36" :class="showIt ? 'block' : 'hidden'" @close="close" @update:glowing="handleLinkClick" :requests="requests"></Banner>
     </div>
   </template>
@@ -123,11 +124,12 @@
 
 
   //Definición de props
-  defineProps({
+  const props = defineProps({
     canLogin: Boolean,
     canRegister: Boolean,
     status: String,
-    requests: Array
+    requests: Array,
+    cmid: Number
   });
 
   // Función para cerrar sesion
@@ -155,7 +157,6 @@ function handleLinkClick() {
       // Activar el efecto
       glowing.value = true;
 
-      console.log('glowing')
       // Delay para que el brillo desaparezca
       setTimeout(() => {
         glowing.value = false;
@@ -185,22 +186,16 @@ function showBanner(){
 }
 
 function close() {
-  console.log('Closing banner');
     showIt.value = false;
     const currentTime = new Date().getTime();
     localStorage.setItem(showBannerKey, currentTime.toString());
-    console.log('showIt state:', showIt.value);
 }
 
 onMounted(() => {
-  console.log(showIt.value)
   window.addEventListener('scroll', handleScroll);
-  console.log('aaa')
   if(checkTimeBanner()){
-    console.log('aaa')
     showBanner();
   }else{
-    console.log('bbb')
   }
 });
 

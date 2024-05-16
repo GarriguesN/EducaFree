@@ -28,9 +28,6 @@
         showModal.value = true;
     };
 
-    // Definir un evento para emitir el formulario
-    defineEmits(["submit"]);
-
     // Función para manejar la carga de archivos de pdfs
     const handleImageUpload = (event) => {
         const file = event.target.files[0]; // Accede al archivo seleccionado
@@ -49,11 +46,31 @@
         }
     }
 
+    const emits = defineEmits(["submit"]);
+
+
+const errorMessage = ref('');
+const checkFields = () => {
+    let fileEmpty = !props.form.file;
+
+     if (fileEmpty) {
+        errorMessage.value = 'Please upload a PDF';
+    } else {
+        emits('submit');
+    }
+
+    if (fileEmpty) {
+        setTimeout(() => {
+            errorMessage.value = '';
+        }, 2000);
+    }
+}
+
 </script>
 
 <template>
     <div class="container px-5 py-8 mx-auto sm:px-20">
-    <FormSection @submitted="$emit('submit')">
+    <FormSection @submitted="checkFields()">
         <template #title>
             {{ updating ? 'Edit Contents': 'New Contents'}}
         </template>
@@ -74,6 +91,7 @@
         </template>
         
             <template #actions>
+                <InputError :message="errorMessage" class="mr-2 mt-2"/>
                 <PrimaryButton class="mt-2">
                     {{ updating ? "Edit" : "Add" }} 
                 </PrimaryButton>

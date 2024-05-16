@@ -5,6 +5,7 @@ import { fetchCourseData } from '@/Pages/Home/services/fetchCoursesData.js';
 import { fetchCourseInfoData } from '@/Pages/Home/services/fetchCourseInfoData.js';
 import { fetchCourseFavoritesData } from '@/Pages/Home/services/fetchCourseFavoritesData.js';
 import Loading from '../Loading.vue';
+import ToTop from '../ToTop.vue';
 
 // Definicion de props
 const props = defineProps({
@@ -204,6 +205,7 @@ const orderBy = (criteria) => {
             </div>
         </div>
     </div>
+    <ToTop></ToTop>
 </section>
 
 <Loading :loading="isLoading"></Loading>

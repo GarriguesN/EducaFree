@@ -216,8 +216,8 @@ class CourseController extends Controller
         $uploader = $course->uploader; // Coger el id del usuario
         $user = User::where('id', $uploader)->first();
 
-        if ($user && !$user->hasRole('colaborator')) {
-            $user->assignRole('colaborator');
+        if ($user && !$user->hasRole('collaborator')) {
+            $user->assignRole('collaborator');
         }
 
         $course->save();

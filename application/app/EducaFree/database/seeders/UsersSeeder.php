@@ -16,7 +16,11 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-
+        $nacho = User::create([
+                'name' => 'nacho',
+                'email' => 'nacho090603@gmail.com',
+                'password' => Hash::make('nacho'),
+        ]);
         $admin = User::create([
             'name' => 'admin',
             'email' => 'support@educafree.es',
@@ -31,20 +35,20 @@ class UsersSeeder extends Seeder
         ]);
         $editor->assignRole('editor');
 
-        $faker = FakerFactory::create();
+        // $faker = FakerFactory::create();
 
-        // Cuantos usuarios se generan random
-        $numberOfUsers = 6000;
+        // // Cuantos usuarios se generan random
+        // $numberOfUsers = 6000;
 
-        for ($i = 0; $i < $numberOfUsers; $i++) {
-            User::create([
-                'name' => $faker->name,
-                'email' => $faker->unique()->safeEmail,
-                'password' => Hash::make($faker->password),
-                'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
-                'updated_at' => now(),
-            ]);
-        }
+        // for ($i = 0; $i < $numberOfUsers; $i++) {
+        //     User::create([
+        //         'name' => $faker->name,
+        //         'email' => $faker->unique()->safeEmail,
+        //         'password' => Hash::make($faker->password),
+        //         'created_at' => $faker->dateTimeBetween('-1 year', 'now'),
+        //         'updated_at' => now(),
+        //     ]);
+        // }
 
 
     }

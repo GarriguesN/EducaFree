@@ -1,12 +1,14 @@
 <script setup>
 import Modal from '../../Components/Modal.vue';
-import { Head, useForm } from '@inertiajs/vue3';
+import { Head, useForm, usePage } from '@inertiajs/vue3';
 import Layout from '@/Layouts/Layout.vue';
 import FormUpdate from "@/Components/Profile/updateInfo.vue";
 import FormPassword from "@/Components/Profile/updatePassword.vue";
 import FormDeleteAccount from  "@/Components/Profile/deleteAccount.vue"
 import {ref} from  "vue";
 import { fetchRankingData } from '../Profile/services/fetchRankigData';
+
+const page = usePage();
 
 // Definicion de props
 const props = defineProps({
@@ -37,6 +39,7 @@ let showModal = ref(false);
 let Items = ref([]);
 const courses = ref([]);
 const favs = ref([]);
+const message = ref('')
 favs.value = props.favorites
 courses.value = props.coursesInfo
 
@@ -76,6 +79,41 @@ function getHours(){
     // Retornar el total de horas completadas redondeado a dos decimales
     return totalHours.toFixed(2);
 }
+
+
+const changePassword = async (id) => {
+     formPassword.put(await route('user.updatePassword', id), {
+        preserveScroll: true,
+        preserveState: true
+    })
+    
+}
+
+const changeInfo = async (id) => {
+    try {
+        await form.put(route('user.update', id), {
+            preserveScroll: true,
+            preserveState: true
+        });
+
+        // Espera un breve momento para permitir que el mensaje flash sea actualizado
+        await new Promise(resolve => setTimeout(resolve, 400));
+
+        // Actualiza el mensaje solo si existe
+        if (page.props.flash.message) {
+            message.value = page.props.flash.message;
+
+            // Borra el mensaje después de 3 segundos
+            setTimeout(() => {
+                message.value = null;
+            }, 3000);
+        }
+    } catch (error) {
+
+    }
+}
+       
+
 </script>
 
 <template>
@@ -112,12 +150,15 @@ function getHours(){
                 </div>
             </section>
         </div>
+        <div v-if="message" class="flex justify-center text-xl text-green-600 font-black absolute left-0 right-0">
+            {{ message }}
+        </div>
         <div class="container px-5 py-8 mx-auto dark:bg-zinc-700 dark:text-white max-w-[80rem]">
             <section id="updateInfo" class="border-b dark:border-gray-600 p-2">
-                <FormUpdate :form="form" @submit="form.put(route('user.update', $page.props.auth.user.id))" :name="$page.props.auth.user.name" :email="$page.props.auth.user.email" />
+                <FormUpdate :form="form" @submit="changeInfo($page.props.auth.user.id)" :name="$page.props.auth.user.name" :email="$page.props.auth.user.email" />
             </section>
             <section id="updatePassword" class="border-b dark:border-gray-600 p-2">
-                <FormPassword :form="formPassword" @submit="formPassword.put(route('user.updatePassword', $page.props.auth.user.id))" />
+                <FormPassword :form="formPassword" @submit="changePassword($page.props.auth.user.id)" />
             </section>
             <section id="deleteUser" class="p-2">
                 <FormDeleteAccount :form="formDelete" @submit="formDelete.delete(route('user.deleteYourself', $page.props.auth.user.id))" />

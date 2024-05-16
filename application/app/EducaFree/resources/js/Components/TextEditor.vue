@@ -179,6 +179,7 @@
     content: props.modelValue,
     onUpdate: ({editor}) => {
         emit('update:modelValue', editor.getHTML())
+        emit('characterCount', editor.storage.characterCount.characters())
     },
     extensions: [
         StarterKit,

@@ -49,7 +49,7 @@ const favorite = (id) => {
             <div class="h-56 border-b dark:border-gray-600 overflow-hidden">
                 <img class="h-auto max-w-full min-[770px]:h-full" :src="urlBase+course.img">
             </div>
-            <div class="m-2 p-2 text-base font-bold line-clamp-1 text-center text-lg">
+            <div class="m-2 p-2 font-bold line-clamp-1 text-center text-lg">
                 {{ course.name }}
             </div>
             <div class="m-2 p-2 text-lg font-normal line-clamp-3 text-justify">

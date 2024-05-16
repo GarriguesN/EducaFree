@@ -36,7 +36,6 @@ const submit = () => {
     <AuthLayout title="Login">
         <Head title="Log in" />
 
-
     <div class="border dark:border-gray-600 rounded p-10 shadow-lg m-5 md:h-[36rem] md:w-[30rem] absolute z-50 bg-white dark:bg-zinc-700 dark:text-white" :class="{ 'md:h-[36rem]': status }">
         <div class="flex items-center justify-center pt-1 pb-10">
           <img :src="logo" alt="Logo" class="h-8 mr-2">
@@ -44,6 +43,9 @@ const submit = () => {
         </div>
         <div v-if="status" class="mb-4 font-medium text-sm text-green-600 text-center">
             {{ status }}
+        </div>
+        <div v-if="$page.props.flash" class="mb-4 font-medium text-sm text-green-600 text-center">
+            {{ $page.props.flash.message }}
         </div>
         <form @submit.prevent="submit" class="h-full">
             <div>

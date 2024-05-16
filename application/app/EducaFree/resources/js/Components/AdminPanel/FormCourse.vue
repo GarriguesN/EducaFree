@@ -29,6 +29,7 @@ let option = ref(true);
 let image = ref(props.image);
 const fileName = ref(image);
 const originalFileName = ref('');
+const errorMessage = ref('');
 
 // Función para abrir el modal
 const openModal = (error) => {
@@ -37,7 +38,7 @@ const openModal = (error) => {
 };
 
 // Definir un evento para emitir el formulario
-defineEmits(["submit"]);
+const emits = defineEmits(["submit"]);
 
 // Funcion para convertir una url a imagen
 function dataURLtoBlob(dataURL) {
@@ -137,11 +138,32 @@ const openFileInput = () => {
     const fileInput = document.getElementById('fileInput');
     fileInput.click();
 };
+
+const checkFields = () => {
+    let nameEmpty = !props.form.name;
+    let descriptionEmpty = !props.form.description;
+
+    if (nameEmpty && descriptionEmpty) {
+        errorMessage.value = 'Please fill Name and Description fields';
+    } else if (nameEmpty) {
+        errorMessage.value = 'Please fill Name field';
+    } else if (descriptionEmpty) {
+        errorMessage.value = 'Please fill Description field';
+    } else {
+        emits('submit');
+    }
+
+    if (nameEmpty || descriptionEmpty) {
+        setTimeout(() => {
+            errorMessage.value = '';
+        }, 2000);
+    }
+}
 </script>
 
 <template>
     <div class="container px-5 py-8 mx-auto sm:px-20">
-    <FormSection @submitted="$emit('submit')">
+    <FormSection @submitted="checkFields()">
         <template #title>
             {{ updating ? 'Edit course': 'New course'}}
         </template>
@@ -178,10 +200,12 @@ const openFileInput = () => {
                         Remove current
                     </button>
                 </div>
+                
             </div>
         </template>
         
             <template #actions>
+                <InputError :message="errorMessage" class="mr-2 mt-2"/>
                 <PrimaryButton class="mt-2">
                     {{ updating ? "Edit" : "Add" }} 
                 </PrimaryButton>

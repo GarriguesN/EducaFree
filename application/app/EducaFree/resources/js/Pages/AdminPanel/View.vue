@@ -1,6 +1,10 @@
 <script setup>
     import PanelLayout from "@/Layouts/PanelLayout.vue";
     import { Head} from '@inertiajs/vue3';
+
+
+    const autoURL = window.location.origin;
+    const urlBase = `${autoURL}/storage/ImagesCourses/`;
 </script>
 
 
@@ -8,10 +12,15 @@
     <Head title="Dashboard"/>
     <PanelLayout title="Dashboard">
         <section class="relative">
-        <div class="grid">
+          <div class="grid">
             <div class="col-span-1 flex flex-col items-center justify-center row">
-                <h2 class="text-3xl text-center text-black mt-8 font-bold">{{ $page.props.course.name }}</h2>
-                <h4 class="text-xl text-center text-black mt-8 font-bold">{{ $page.props.course.description }}</h4>
+                <div class="flex flex-col justify-center items-center" v-if="$page.props.course.img">
+                    <img class="w-[10rem]" :src="urlBase+$page.props.course.img">
+                    <p class="text-center mt-2 text-sm text-gray-400">Image preview</p>
+                </div>
+                <div class="text-center mt-2 text-sm text-gray-400" v-else>No image loaded</div>
+                <h2 class="text-3xl text-center text-black mt-8 font-bold dark:text-white">{{ $page.props.course.name }}</h2>
+                <h4 class="text-xl text-center text-black mt-8 font-bold dark:text-white">{{ $page.props.course.description }}</h4>
             </div>
         </div>
     </section>

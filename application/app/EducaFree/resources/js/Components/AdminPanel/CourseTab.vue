@@ -247,7 +247,7 @@ const urlBase = `${autoURL}/storage/ImagesCourses/`;
         </div>
     </section>
 
-    <section id="lessons" class="h-[50vh]">
+    <section id="lessons" class="min-h-[50vh]">
     <div class="container px-5 py-16 mx-auto sm:px-20">
       <div class="md:flex w-full h-full">
         <div class="border-b border-gray-200 min-w-52 dark:border-gray-600">
@@ -259,7 +259,7 @@ const urlBase = `${autoURL}/storage/ImagesCourses/`;
             <li v-for="(lesson, index) in $page.props.lessons" :key="index" class="me-2" role="presentation">
               <button @click="activateTab(index)"
                       :class="{ 'border-blue-700': activeTab === index }"
-                      class="inline-block p-4 border-b-2 rounded-t-lg w-full flex justify-between" :id="'lesson-tab-' + index"
+                      class="p-4 border-b-2 rounded-t-lg w-full flex justify-between" :id="'lesson-tab-' + index"
                       :data-tabs-target="'#lesson-content-' + index" type="button" role="tab"
                       :aria-controls="'lesson-content-' + index"
                       :aria-selected="activeTab === index">{{index+1}}. {{ lesson.name }}
@@ -312,14 +312,14 @@ const urlBase = `${autoURL}/storage/ImagesCourses/`;
         </Modal>
 
 
-        <div id="default-styled-tab-content" class="bg-gray-50 text-medium text-gray-500 rounded-lg w-full max-w-full dark:bg-zinc-600">
+        <div id="default-styled-tab-content" class="bg-gray-50 text-medium text-gray-500 rounded-lg w-full max-w-[90%] dark:bg-zinc-600">
           <div v-if="$page.props.lessons.length > 0" v-for="(lesson, index) in $page.props.lessons" :key="index"
                :class="{ hidden: activeTab !== index }" class="p-4 rounded-lg bg-gray-50 dark:bg-zinc-600 max-w-full"
                :id="'lesson-content-' + index" role="tabpanel"
                :aria-labelledby="'lesson-tab-' + index">
                 <div v-for="(point, pointIndex) in lesson.points" :key="pointIndex" class="max-w-full mb-4">
                     <h3 class="text-lg font-medium text-gray-800 dark:text-white border-b dark:border-gray-400 mb-2">{{ point.name }}</h3>
-                    <div class="explanation text-justify text-gray-600 dark:text-gray-200" v-html="point.explanation"></div>
+                    <div class="explanation text-justify text-gray-600 dark:text-gray-200 break-words" v-html="point.explanation"></div>
                     <div class="flex">
                         <p @click="openEditPoint(point.name, point.explanation, point.id)" class="text-blue-600 hover:text-blue-800 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg></p>
                         <p @click="openDelete(point.id, 'point')" class="text-red-600 hover:text-red-800 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></p>
@@ -331,7 +331,7 @@ const urlBase = `${autoURL}/storage/ImagesCourses/`;
                         New point
                     </p>
                 </div>
-                <div v-if="lesson.pdf_url != null" class="border-t border-gray-200 flex flex">
+                <div v-if="lesson.pdf_url != null" class="border-t border-gray-200 flex">
                     <a :href="lesson.pdf_url" class="italic text-blue-400 hover:text-blue-700 mr-2">PDF: {{ lesson.name }}</a>
                     <p @click="editPDF(lesson.id)" class="text-blue-600 hover:text-blue-800 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polygon points="16 3 21 8 8 21 3 21 3 16 16 3"></polygon></svg></p>
                     <p @click="openDelete(lesson.id, 'pdf')" class="text-red-600 hover:text-red-800 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="square" stroke-linejoin="bevel"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg></p>

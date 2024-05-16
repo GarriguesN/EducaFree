@@ -96,7 +96,7 @@ class UserController extends Controller
         
         $user->save();
 
-        return redirect()->route('profile.show');
+        return redirect()->route('profile.show')->with('message', 'Profile updated successfully.');
     }
 
     // Funcion para actualizar la contraseña del usuario
@@ -109,8 +109,10 @@ class UserController extends Controller
             $user->password = Hash::make($request['newPassword']);
             $user->save();
         }
+        $authenticatedSessionController = app(AuthenticatedSessionController::class);
+        $logoutResponse = $authenticatedSessionController->destroy($request);
 
-        return redirect()->route('profile.show');
+        return Inertia::render('Auth/Login')->with('flash', ['message' => 'Password updated successfully.']);
      }
 
      // Funcion para eliminarse a si mismo
@@ -120,6 +122,7 @@ class UserController extends Controller
         // Cerrar la sesion del usuario
         $authenticatedSessionController = app(AuthenticatedSessionController::class);
         $logoutResponse = $authenticatedSessionController->destroy($request);
+        
         return redirect()->route('home');
     }
 

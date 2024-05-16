@@ -36,6 +36,7 @@ const chat = ref([]);
 const textChat = ref('');
 const thinking = ref(false);
 const change = ref(false);
+const message = ref('');
 
 //Definición de los formularios
 const form = useForm({
@@ -200,7 +201,6 @@ change.value = !change.value;
 
 const sendPrompt = async () => {
     if(textChat.value.trim() == ''){
-        alert('No puedes enviar un comentario vacío');
         return
     }else{
         chat.value.push({ message: textChat.value , sender: 'You'});
@@ -258,13 +258,13 @@ const sendPrompt = async () => {
 
                 </div>
                 <div id="default-styled-tab-content"
-                    class="bg-gray-50 text-medium text-gray-500 rounded-lg w-full max-w-full dark:bg-zinc-600" :class="open ? 'w-[80rem]': 'w-full'">
+                    class="bg-gray-50 text-medium text-gray-500 rounded-lg w-full max-w-[90%] dark:bg-zinc-600" :class="open ? 'w-[80rem]': 'w-full'">
                     <div v-if="$page.props.lessons.length > 0" v-for="(lesson, index) in $page.props.lessons" :key="index"
                         :class="{ hidden: activeTab !== index }" class="p-4 rounded-lg bg-gray-50 dark:bg-zinc-600 max-w-full"
                         :id="'lesson-content-' + index" role="tabpanel" :aria-labelledby="'lesson-tab-' + index">
                         <div v-for="(point, pointIndex) in lesson.points" :key="pointIndex" class="max-w-full mb-4">
                             <h3 class="text-lg font-medium text-gray-800 dark:text-white border-b dark:border-gray-500 mb-2 w-full">{{ point.name }}</h3>
-                            <div class="explanation text-justify text-gray-600 dark:text-gray-200" v-html="point.explanation"></div>
+                            <div class="explanation text-justify text-gray-600 dark:text-gray-200 break-words" v-html="point.explanation"></div>
                         </div>
                         <div v-if="lesson.pdf_url != null || lesson.content_url != null"
                             class="border-t border-gray-200 flex flex-col">
@@ -285,7 +285,7 @@ const sendPrompt = async () => {
         </div>
 
         <!-- CHAT -->
-    <div class="hidden min-[1300px]:block">
+    <div v-if="cmid == null" class="hidden min-[1300px]:block">
         <button @click="openSide" id="chatButton" type="button" class="absolute top-[336px] right-5 inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg hover:text-blue-700  dark:text-gray-400 dark:hover:text-blue-500">
             <span v-if="!change" class="inline-flex items-center">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -327,9 +327,9 @@ const sendPrompt = async () => {
                         <path fill-rule="evenodd" d="M5 4a.75.75 0 0 1 .738.616l.252 1.388A1.25 1.25 0 0 0 6.996 7.01l1.388.252a.75.75 0 0 1 0 1.476l-1.388.252A1.25 1.25 0 0 0 5.99 9.996l-.252 1.388a.75.75 0 0 1-1.476 0L4.01 9.996A1.25 1.25 0 0 0 3.004 8.99l-1.388-.252a.75.75 0 0 1 0-1.476l1.388-.252A1.25 1.25 0 0 0 4.01 6.004l.252-1.388A.75.75 0 0 1 5 4ZM12 1a.75.75 0 0 1 .721.544l.195.682c.118.415.443.74.858.858l.682.195a.75.75 0 0 1 0 1.442l-.682.195a1.25 1.25 0 0 0-.858.858l-.195.682a.75.75 0 0 1-1.442 0l-.195-.682a1.25 1.25 0 0 0-.858-.858l-.682-.195a.75.75 0 0 1 0-1.442l.682-.195a1.25 1.25 0 0 0 .858-.858l.195-.682A.75.75 0 0 1 12 1ZM10 11a.75.75 0 0 1 .728.568.968.968 0 0 0 .704.704.75.75 0 0 1 0 1.456.968.968 0 0 0-.704.704.75.75 0 0 1-1.456 0 .968.968 0 0 0-.704-.704.75.75 0 0 1 0-1.456.968.968 0 0 0 .704-.704A.75.75 0 0 1 10 11Z" clip-rule="evenodd" />
                     </svg>
                     <input v-if="!thinking" type="text" v-model="textChat" class="w-full border-outline bg-white border border-gray-200 rounded-xl px-2 py-2.5 pl-10 pr-24 text-sm text-slate-700 l disabled:cursor-not-allowed disabled:opacity-75 dark:border-gray-700 dark:bg-zinc-600 dark:text-gray-300" name="prompt" placeholder="Ask AI ..." />
-                    <input v-else type="text" disabled class="w-full border-outline bg-white border border-gray-200 rounded-xl px-2 py-2.5 pl-10 pr-24 text-sm text-slate-700 l disabled:cursor-not-allowed disabled:opacity-75 dark:border-gray-700 dark:bg-zinc-600 dark:text-gray-300" name="prompt" placeholder="Thinking..." />
+                    <input v-else type="text" disabled class="cursor-wait w-full border-outline bg-white border border-gray-200 rounded-xl px-2 py-2.5 pl-10 pr-24 text-sm text-slate-700 l disabled:cursor-not-allowed disabled:opacity-75 dark:border-gray-700 dark:bg-zinc-600 dark:text-gray-300" name="prompt" placeholder="Thinking..." />
                     <button v-if="!thinking" @click="sendPrompt" type="button" class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-blue-700 rounded-xl px-2 py-1 text-xs tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  active:opacity-100 active:outline-offset-0 dark:bg-blue-600 dark:text-slate-100 dark:focus-visible:outline-blue-600">Send</button>
-                    <button v-else @click="sendPrompt" type="button" disabled class="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer bg-blue-700 rounded-xl px-2 py-1 text-xs tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  active:opacity-100 active:outline-offset-0 dark:bg-blue-600 dark:text-slate-100 dark:focus-visible:outline-blue-600">
+                    <button v-else @click="sendPrompt" type="button"  class="disabled cursor-wait absolute right-3 top-1/2 -translate-y-1/2 bg-blue-700 rounded-xl px-2 py-1 text-xs tracking-wide text-slate-100 transition hover:opacity-75 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2  active:opacity-100 active:outline-offset-0 dark:bg-blue-600 dark:text-slate-100 dark:focus-visible:outline-blue-600">
                         <div class="animate-spin">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
                         </div>
@@ -356,7 +356,7 @@ const sendPrompt = async () => {
             <div v-for="comment in comments.data" :key="comment.id" class="p-4 text-base bg-white dark:bg-zinc-700 w-[80%] m-auto">
                 <div class="flex justify-between items-center mb-2">
                     <div class="flex items-center">
-                        <p class="inline-flex items-center mr-3 text-sm text-gray-900 text-xl font-semibold dark:text-white">
+                        <p class="inline-flex items-center mr-3 text-gray-900 text-xl font-semibold dark:text-white">
                             {{ comment.user.name }}
                         </p>
                         <p class="text-sm text-gray-600 items-center dark:text-gray-300">
@@ -415,7 +415,7 @@ const sendPrompt = async () => {
                     <div v-for="reply in comment.replies" :key="reply.id" class="p-2 text-base bg-white dark:bg-zinc-700 w-[80%] m-auto">
                         <div class="flex justify-between items-center mb-2">
                             <div class="flex items-center">
-                                <p class="inline-flex items-center mr-3 text-sm text-gray-900 dark:text-white text-xl font-semibold">
+                                <p class="inline-flex items-center mr-3 text-gray-900 dark:text-white text-xl font-semibold">
                                     {{ reply.user.name }}
                                 </p>
                                 <p class="text-sm text-gray-600 items-center dark:text-gray-300">
@@ -498,7 +498,7 @@ const sendPrompt = async () => {
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
                 </svg>
                 <h3 class="mb-5 text-lg font-normal text-gray-500  dark:text-gray-200">Report Reason</h3>
-                <div class="m-auto flex justify-center justify-around">
+                <div class="m-auto flex justify-around">
                     <button @click="postReport(id, type, 'Troll')" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300  font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Troll</button>
                     <button @click="postReport(id, type, 'Bad Words')" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Bad Words</button>
                     <button @click="postReport(id, type, 'Offensive')" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center">Offensive</button>

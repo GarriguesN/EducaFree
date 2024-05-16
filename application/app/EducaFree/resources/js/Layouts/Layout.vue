@@ -1,7 +1,7 @@
 <script setup>
 import Navbar from '../Components/Header-nav-footer/Navbar.vue';
 import Footer from '../Components/Header-nav-footer/Footer.vue';
-import ToggleDark from  '../Components/ToggleDark.vue';
+
 import { fetchRequestData } from '@/Pages/AdminPanel/services/fetchRequestsData';
 
 // Definicion de props

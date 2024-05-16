@@ -8,7 +8,7 @@ import CourseTab from '../AdminPanel/CourseTab.vue'
 </script>
 
 <template>
-    <section :class="adminpanel ? 'h-full' : 'h-full pt-10'">
+    <section :class="adminpanel ? 'h-full' : 'pt-10'">
         <div v-if="$page.props.pending" class="text-center text-gray-400 dark:text-gray-200 border-b mb-10 dark:bg-zinc-600 dark:border-gray-600" :class="adminpanel ? 'mt-2 p-2' : ' mt-[5rem] p-4'">
             This course is pending. Please wait. You can still update it, but it's possible we take longer to validate the course. Thank you for your contribution to our community.<br>
             You can delete this course clicking <a :href="route('pendingcourse.delete')" class="text-red-500 font-bold hover:underline cursor-pointer">here</a>  

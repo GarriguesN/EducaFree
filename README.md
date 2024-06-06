@@ -2,6 +2,9 @@
 
 EducaFree is a comprehensive educational platform designed to provide free access to quality educational resources. This project is a final assignment for a web development course, aiming to bridge the educational gap by offering a variety of learning materials to students globally.
 
+> [!NOTE]  
+> This project is a final course project for a web development course, designed to showcase the skills and knowledge acquired throughout the course. The goal is to provide a practical and impactful solution to real-world problems in the educational sector.
+
 ## Table of Contents
 - [Introduction](#introduction)
 - [Features](#features)

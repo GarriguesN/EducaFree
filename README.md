@@ -1,29 +1,65 @@
-<h2>TODO List</h2>
+# EducaFree
 
-<h3>Step 1: Clear Cache and Set Permissions</h3>
+EducaFree is a comprehensive educational platform designed to provide free access to quality educational resources. This project is a final assignment for a web development course, aiming to bridge the educational gap by offering a variety of learning materials to students globally.
 
-<p>In the root directory of your project, run the following commands to clear cache and set the correct permissions:</p>
+## Table of Contents
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Contributing](#contributing)
+- [License](#license)
+- [Deployment](#deployment)
+- [TODO List](#todo-list)
 
-<pre><code>
-# Clear cache and configuration
-php artisan cache:clear
-php artisan config:clear
+## Introduction
+EducaFree is an open-source project developed as the final project for a web development course. It offers free educational resources, including interactive lessons, quizzes, and a community forum for students to collaborate and learn together.
 
-# Set owner and permissions for storage and bootstrap/cache directories
-chown -R $USER:www-data storage
-chown -R $USER:www-data bootstrap/cache
-chmod -R 775 storage
-chmod -R 755 bootstrap/cache
+## Features
+- Interactive lessons
+- Quizzes and assessments
+- Community forum
+- User-friendly interface
 
-# Restart Apache service
-service apache2 restart
-</code></pre>
+## Installation
+To set up the project locally, follow these steps:
 
-<h3>Step 2: Update File and Directory Permissions</h3>
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/GarriguesN/EducaFree.git
+    cd EducaFree
+    ```
 
-<p>To ensure proper permissions for your project, update the owner and group to <code>www-data</code> for all files and directories. Additionally, set appropriate file and directory permissions:</p>
+2. Install dependencies:
+    ```bash
+    npm install
+    composer install
+    ```
 
-<pre><code>
+3. Set up environment variables:
+    - Create a `.env` file based on the `.env.example` provided.
+
+4. Run the application:
+    ```bash
+    npm start
+    ```
+
+## Deployment
+To deploy the application using Docker, follow these steps:
+
+1. Build and run the Docker containers:
+    ```bash
+    docker-compose up --build
+    ```
+
+2. The application will be accessible at `http://localhost:3000`.
+
+## TODO List
+
+### Step 1: Clear Cache and Set Permissions
+In the root directory of your project, run the following commands to clear cache and set the correct permissions:
+
+```bash
 # Change owner and group to www-data for all files and directories
 chown -R www-data:www-data *
 
@@ -33,13 +69,7 @@ usermod -a -G www-data ubuntu
 # Set file permissions to 644 and directory permissions to 755
 find /var/www/html/EducaFree -type f -exec chmod 644 {} \;
 find /var/www/html/EducaFree -type d -exec chmod 755 {} \;
-</code></pre>
 
-<h3>Step 3: Create Storage Link and Update Permissions</h3>
-
-<p>If there is no previous storage link, create one and set the necessary permissions for the storage directories:</p>
-
-<pre><code>
 # Create storage link and set permissions
 php artisan storage:link
 
@@ -50,13 +80,7 @@ chmod -R 775 public/storage
 # Change owner and group to www-data for storage directories
 chown -R www-data:www-data storage/app/public
 chown -R www-data:www-data public/storage
-</code></pre>
 
-<h3>Running Development and Production Builds</h3>
-
-<p>To use development and production builds, you need to install the required packages and run the appropriate commands:</p>
-
-<pre><code>
 # Install vite globally
 npm install -g vite
 
@@ -65,4 +89,13 @@ npm run dev
 
 # Run production build
 npm run build
-</code></pre>
+```
+
+## Usage
+After installation, you can access the application at `http://localhost:3000`. Use the platform to explore and engage with the educational content provided.
+
+## Contributing
+Contributions are welcome! Please read the [CONTRIBUTING.md](CONTRIBUTING.md) file for guidelines on how to contribute to this project.
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
